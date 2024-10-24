@@ -14,7 +14,7 @@
 
 ### Andrew Uriell
 
-- 1 (10.24)
+- 1 (10/24)
 
 ### Michael Oliver
 
