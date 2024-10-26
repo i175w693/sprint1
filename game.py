@@ -49,6 +49,8 @@ class UIManager:
         self.screen = pygame.display.set_mode((self.WIDTH, self.HEIGHT), pygame.RESIZABLE)  # Allow resizing
         pygame.display.set_caption("Cookie Clicker")
         self.buttons = self.create_buttons()
+        self.font_size = int(self.WIDTH * 0.03)  # Dynamic font size based on width
+        self.font = get_font(self.font_size)
 
     # Function to draw text
     def draw_text(self, text, font, color, x, y):
@@ -64,7 +66,7 @@ class UIManager:
 
     def handle_cookie_click(self):
         self.cookie_count += self.cookies_per_click
-        print(f"Cookie clicked! Total cookies: {self.cookie_count}")  # Log message for cookie clicks
+        # print(f"Cookie clicked! Total cookies: {self.cookie_count}")  # Log message for cookie clicks
 
     def handle_shop_click(self, mouse_pos):
         for button, item in self.buttons:
@@ -78,9 +80,7 @@ class UIManager:
         return sum(item.cps * item.purchased_count for item in self.shop_items)
 
     def draw_stats(self, screen):
-        font_size = int(self.WIDTH * 0.03)  # Dynamic font size based on width
-        font = get_font(font_size)
-        self.draw_text(f"Cookies: {self.cookie_count}", font, BLACK, int(self.WIDTH * 0.01), int(self.HEIGHT * 0.01))
+        self.draw_text(f"Cookies: {self.cookie_count}", self.font, BLACK, int(self.WIDTH * 0.01), int(self.HEIGHT * 0.01))
 
     def draw_upgrades(self, screen):
         font_size = int(self.WIDTH * 0.03)  # Dynamic font size based on width
@@ -107,6 +107,7 @@ class Game:
         self.ui_manager = UIManager()
         self.cookie = Cookie(f"{ASSETS_FILEPATH}/cookie.png", 0.2, self.ui_manager.WIDTH, self.ui_manager.HEIGHT)  # Increase size to 20% of the screen width
         self.last_time = time.time()  # Track time for CPS
+        self.clock = pygame.time.Clock() # Used to limit game to 20 ticks per second
 
     def handle_events(self):
         for event in pygame.event.get():
@@ -121,6 +122,7 @@ class Game:
                 # If cookie is clicked
                 if self.cookie.rect.collidepoint(mouse_pos):
                     self.ui_manager.handle_cookie_click()
+                    self.ui_manager.draw_text(f"+{self.ui_manager.cookies_per_click}", self.ui_manager.font, BLACK, int(mouse_pos[0]), int(mouse_pos[1]))
 
                 # If shop item is clicked
                 self.ui_manager.handle_shop_click(mouse_pos)
@@ -141,10 +143,10 @@ class Game:
 
             self.ui_manager.screen.fill(WHITE)
             screen = self.ui_manager.screen
+            self.cookie.draw(screen)
             self.handle_events()
 
             # Draw UI elements
-            self.cookie.draw(screen)
             self.cookie.update_rotation()
             self.ui_manager.draw_stats(screen)
             self.ui_manager.draw_upgrades(screen)
@@ -153,3 +155,6 @@ class Game:
 
             # Update display
             pygame.display.flip()
+        
+            # limits game to 20 ticks per second
+            self.clock.tick(20)
