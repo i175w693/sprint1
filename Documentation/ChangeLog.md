@@ -1,5 +1,12 @@
 # Change Log
 
+## October 26 (Sprint 1)
+
+### Modified
+
+- Changed format of the directory to provide better readability and segmentation of code
+- Split code into multiple files
+
 ## October 24 (Sprint 1)
 
 ### Added

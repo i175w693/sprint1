@@ -1,12 +1,10 @@
 # Person Hours Documentation
 
-## Estimate Person Hours: TBD
-
-- Placeholder
-
-## Actual Person Hours
+## Person Hours
 
 ### Peter Pham
+
+- 2 (10/26)
 
 ### Ian Wilson
 
