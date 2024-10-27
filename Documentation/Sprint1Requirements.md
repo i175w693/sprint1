@@ -17,8 +17,10 @@
 - [X] Save System
   - [X] Keep track of user information per save
   - [X] Ability to load any save
-- [ ] Main Menu Screen
-  - [ ] Buttons
+- [X] Main Menu Screen
+  - [X] Buttons
 - [ ] Purchase Display
   - [ ] Upgrade Sprites
-  - [ ] Keep track of how many times an upgrade has been purchased
+  - [X] Keep track of how many times an upgrade has been purchased
+  - [ ] Display amount of times an upgrade has been purchased
+- [ ] Documentation 

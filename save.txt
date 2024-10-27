@@ -1,4 +1,4 @@
-232
-"Extra Hands":0
-"Grandma":0
-"Factory":0
+4478
+"Extra Hands":7
+"Grandma":5
+"Factory":7
