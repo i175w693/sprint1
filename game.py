@@ -15,6 +15,8 @@ import time
 
 from shop import *
 from cookie import Cookie
+from save_game import save
+from load_game import load
 
 # Initialize pygame
 pygame.init()
@@ -40,11 +42,11 @@ class UIManager:
         self.HEIGHT = pygame.display.Info().current_h
         self.cookie_count = 0
         self.upgrades_acquired = []
-        self.shop_items = [
-            ShopItem("Extra Hands", 100, None, 2),
-            ShopItem("Grandma", 100, 1, None),
-            ShopItem("Factory", 500, 5, None)
-        ]
+        self.shop_items = {
+            'Extra Hands': ShopItem("Extra Hands", 100, None, 2),
+            'Grandma': ShopItem("Grandma", 100, 1, None),
+            'Factory': ShopItem("Factory", 500, 5, None)
+        }
         self.cookie_per_click = 1
         # Set up screen to dynamically fetch the display's width and height
         self.screen = pygame.display.set_mode((self.WIDTH, self.HEIGHT), pygame.RESIZABLE)  # Allow resizing
@@ -60,9 +62,9 @@ class UIManager:
 
     def create_buttons(self):
         buttons = []
-        for idx, item in enumerate(self.shop_items):
-            button = LargeButton(self.screen, self.WIDTH - int(self.WIDTH * 0.25), int(self.HEIGHT * 0.15) + idx * int(self.HEIGHT * 0.1), item.name, self.WIDTH, self.HEIGHT)
-            buttons.append((button, item))
+        for idx, (k, v) in enumerate(self.shop_items.items()):
+            button = LargeButton(self.screen, self.WIDTH - int(self.WIDTH * 0.25), int(self.HEIGHT * 0.15) + idx * int(self.HEIGHT * 0.1), v.name, self.WIDTH, self.HEIGHT)
+            buttons.append((button, v))
         return buttons
 
     def handle_cookie_click(self):
@@ -78,13 +80,13 @@ class UIManager:
                 self.upgrades_acquired.append(item)
 
     def cookies_per_second(self):
-        return sum(item.cps * item.purchased_count for item in self.shop_items if item.cps != None)
+        return sum(item.cps * item.purchased_count for item in self.shop_items.values() if item.cps != None)
     
     def cookies_per_click(self):
-        if (1 * sum(item.cpc * item.purchased_count for item in self.shop_items if item.cpc != None)) == 0:
+        if (1 * sum(item.cpc * item.purchased_count for item in self.shop_items.values() if item.cpc != None)) == 0:
             self.cookie_per_click = 1
         else:
-            self.cookie_per_click = 1 * sum(item.cpc * item.purchased_count for item in self.shop_items if item.cpc != None)
+            self.cookie_per_click = 1 * sum(item.cpc * item.purchased_count for item in self.shop_items.values() if item.cpc != None)
 
     def draw_stats(self, screen):
         self.draw_text(f"Cookies: {self.cookie_count}", self.font, BLACK, int(self.WIDTH * 0.01), int(self.HEIGHT * 0.01))
@@ -118,6 +120,14 @@ class Game:
 
     def handle_events(self):
         for event in pygame.event.get():
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_s:
+                    save(self.ui_manager)
+
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_l:
+                    load(self.ui_manager)
+
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()

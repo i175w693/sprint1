@@ -14,9 +14,9 @@
 - [X] Basic Upgrades Implementation
   - [X] Clicker upgade
   - [X] Auto-clicker upgrade
-- [ ] Save System
-  - [ ] Keep track of user information per save
-  - [ ] Ability to load any save
+- [X] Save System
+  - [X] Keep track of user information per save
+  - [X] Ability to load any save
 - [ ] Main Menu Screen
   - [ ] Buttons
 - [ ] Purchase Display

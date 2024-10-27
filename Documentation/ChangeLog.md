@@ -7,6 +7,8 @@
 - Code for showing cookies obtained per click (needs bugfixing to have text last for more than 1 cycle) **(Peter)**
 - Limited game to 20 ticks per second to prevent overutilization of resources **(Peter)**
 - Cookies per click upgrade **(Peter)**
+- Save game functionality **(Peter)**
+- Load game functionality **(Peter)**
 
 ### Modified
 
