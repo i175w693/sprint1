@@ -11,8 +11,8 @@
   - [X] Middle section where you can see upgrades that have been aquired
   - [X] Right side that shows upgrades
 - [X] Display of the user balance
-- [ ] Basic Upgrades Implementation
-  - [ ] Clicker upgade
+- [X] Basic Upgrades Implementation
+  - [X] Clicker upgade
   - [X] Auto-clicker upgrade
 - [ ] Save System
   - [ ] Keep track of user information per save

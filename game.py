@@ -39,12 +39,13 @@ class UIManager:
         self.WIDTH = pygame.display.Info().current_w
         self.HEIGHT = pygame.display.Info().current_h
         self.cookie_count = 0
-        self.cookies_per_click = 1
         self.upgrades_acquired = []
         self.shop_items = [
-            ShopItem("Grandma", 100, 1),
-            ShopItem("Factory", 500, 5),
+            ShopItem("Extra Hands", 100, None, 2),
+            ShopItem("Grandma", 100, 1, None),
+            ShopItem("Factory", 500, 5, None)
         ]
+        self.cookie_per_click = 1
         # Set up screen to dynamically fetch the display's width and height
         self.screen = pygame.display.set_mode((self.WIDTH, self.HEIGHT), pygame.RESIZABLE)  # Allow resizing
         pygame.display.set_caption("Cookie Clicker")
@@ -65,7 +66,7 @@ class UIManager:
         return buttons
 
     def handle_cookie_click(self):
-        self.cookie_count += self.cookies_per_click
+        self.cookie_count += self.cookie_per_click
         # print(f"Cookie clicked! Total cookies: {self.cookie_count}")  # Log message for cookie clicks
 
     def handle_shop_click(self, mouse_pos):
@@ -77,7 +78,13 @@ class UIManager:
                 self.upgrades_acquired.append(item)
 
     def cookies_per_second(self):
-        return sum(item.cps * item.purchased_count for item in self.shop_items)
+        return sum(item.cps * item.purchased_count for item in self.shop_items if item.cps != None)
+    
+    def cookies_per_click(self):
+        if (1 * sum(item.cpc * item.purchased_count for item in self.shop_items if item.cpc != None)) == 0:
+            self.cookie_per_click = 1
+        else:
+            self.cookie_per_click = 1 * sum(item.cpc * item.purchased_count for item in self.shop_items if item.cpc != None)
 
     def draw_stats(self, screen):
         self.draw_text(f"Cookies: {self.cookie_count}", self.font, BLACK, int(self.WIDTH * 0.01), int(self.HEIGHT * 0.01))
@@ -122,7 +129,7 @@ class Game:
                 # If cookie is clicked
                 if self.cookie.rect.collidepoint(mouse_pos):
                     self.ui_manager.handle_cookie_click()
-                    self.ui_manager.draw_text(f"+{self.ui_manager.cookies_per_click}", self.ui_manager.font, BLACK, int(mouse_pos[0]), int(mouse_pos[1]))
+                    self.ui_manager.draw_text(f"+{self.ui_manager.cookie_per_click}", self.ui_manager.font, BLACK, int(mouse_pos[0]), int(mouse_pos[1]))
 
                 # If shop item is clicked
                 self.ui_manager.handle_shop_click(mouse_pos)
@@ -145,6 +152,7 @@ class Game:
             screen = self.ui_manager.screen
             self.cookie.draw(screen)
             self.handle_events()
+            self.ui_manager.cookies_per_click()
 
             # Draw UI elements
             self.cookie.update_rotation()
