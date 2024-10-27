@@ -20,35 +20,34 @@ class Button:
         self.font = get_font(font_size)
 
     # Function to draw text
-    def draw_text(self, text, font, color, x, y):
+    def draw_text(self, text, font, color, x, y, screen):
         text_obj = font.render(text, True, color)
-        self.screen.blit(text_obj, (x, y))
+        screen.blit(text_obj, (x, y))
 
     def draw(self, screen):
         pygame.draw.rect(screen, BUTTON_COLOR, self.rect)
-        self.draw_text(self.text, self.font, WHITE, self.rect.x + 10, self.rect.y + 5)
+        self.draw_text(self.text, self.font, WHITE, self.rect.x + 10, self.rect.y + 5, screen)
 
     def is_clicked(self, mouse_pos):
         return self.rect.collidepoint(mouse_pos)
 
+
 # Small Button class
 class SmallButton(Button):
     def __init__(self, x, y, text):
-        super().__init__(x, y, int(WIDTH * 0.2), int(HEIGHT * 0.05), text, int(WIDTH * 0.03))
+        width = int(pygame.display.Info().current_w * 0.2)  # Define width dynamically if needed
+        height = int(pygame.display.Info().current_h * 0.05)  # Define height dynamically if needed
+        super().__init__(x, y, width, height, text, int(height * 0.5))  # Call to the parent constructor
 
-# Large Button class with count
+
+# Large Button class
 class LargeButton(Button):
-    def __init__(self, screen, x, y, text, WIDTH, HEIGHT, initial_count=0):
-        super().__init__(x, y, int(WIDTH * 0.3), int(HEIGHT * 0.1), text, int(WIDTH * 0.04))
-        self.count = initial_count  # Initialize purchase count
-        self.screen = screen
-
-    # Function to draw text
-    def draw_text(self, text, font, color, x, y):
-        text_obj = font.render(text, True, color)
-        self.screen.blit(text_obj, (x, y))
+    def __init__(self, screen, x, y, text, width, height):
+        self.screen = screen  # Store screen reference
+        super().__init__(x, y, width, height, text, int(height * 0.5))  # Initialize the base class
 
     def draw(self, screen):
-        super().draw(screen)  # Draw the button
-        count_text = f"x{self.count}"  # Display count
-        self.draw_text(count_text, self.font, WHITE, self.rect.x + self.rect.width - 40, self.rect.y + 5)  # Position count on the right side
+        super().draw(self.screen)  # Use the stored screen for drawing
+
+
+
