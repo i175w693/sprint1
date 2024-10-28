@@ -267,8 +267,12 @@ class Game:
                     # Handle main menu button clicks
                     if self.ui_manager.button_clicked("Continue", mouse_pos):
                         self.ui_manager = UIManager() # recreates a new UIManager to populate with the save file's data
-                        load(self.ui_manager)  # Load the game state when Continue is clicked
-                        self.ui_manager.show_main_menu = False  # Hide the main menu after loading
+                        # Load the game state when Continue is clicked
+                        if load(self.ui_manager) == None: # if a save file doesnt exist, create a new save
+                            self.ui_manager = UIManager() # recreates a new UIManager with empty stats
+                            self.ui_manager.show_main_menu = False
+                        else: # else load the save file
+                            self.ui_manager.show_main_menu = False  # Hide the main menu after loading
                     elif self.ui_manager.button_clicked("New Game", mouse_pos):
                         self.ui_manager = UIManager() # recreates a new UIManager with empty stats
                         self.ui_manager.show_main_menu = False
