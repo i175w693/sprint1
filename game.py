@@ -4,7 +4,7 @@ Purpose: This module is the main game code for the Cookie clicker game.
 Inputs: None
 Output: None
 Additional code sources: 
-Developers: Ian Wilson, Andrew Uriell, Peter Pham, Michael Oliver
+Developers: Ian Wilson, Andrew Uriell, Peter Pham, Michael Oliver, Jack Youngquist
 Date: 10/24/2024
 Last Modified: 10/27/2024
 '''
@@ -115,7 +115,8 @@ class UIManager:
                 self.cookie_count -= item.cost
                 item.purchased_count += 1  # Increment the count for this item
                 button.count = item.purchased_count  # Update button's count display
-                self.upgrades_acquired.append(item)
+                if item not in self.upgrades_acquired:
+                    self.upgrades_acquired.append(item)  # Add the item if it doesn't exist
 
     # returns the amount of cookies the user should be earning per second based on the purchased items
     def cookies_per_second(self):
@@ -138,7 +139,10 @@ class UIManager:
         font = get_font(font_size)
         self.draw_text("Upgrades Acquired:", font, BLACK, int(self.WIDTH * 0.4), int(self.HEIGHT * 0.05))
         for idx, upgrade in enumerate(self.upgrades_acquired):
-            self.draw_text(f"{upgrade.name} (CPS: {upgrade.cps})", font, BLACK, int(self.WIDTH * 0.4), int(self.HEIGHT * 0.15) + idx * int(self.HEIGHT * 0.05))
+            if upgrade.cpc == None:
+                self.draw_text(f"{upgrade.name} (CPS: {upgrade.cps}): {upgrade.purchased_count}", font, BLACK, int(self.WIDTH * 0.4), int(self.HEIGHT * 0.15) + idx * int(self.HEIGHT * 0.05))
+            else:
+                self.draw_text(f"{upgrade.name} (CPC: {upgrade.cpc}): {upgrade.purchased_count}", font, BLACK, int(self.WIDTH * 0.4), int(self.HEIGHT * 0.15) + idx * int(self.HEIGHT * 0.05))
 
     # draws the shop section of the screen
     def draw_shop(self, screen):

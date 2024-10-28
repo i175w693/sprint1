@@ -4,7 +4,7 @@ Purpose: This module is used to load the user's profile from a save file
 Inputs: None
 Output: None
 Additional code sources: 
-Developers: Peter Pham
+Developers: Peter Pham, Jack youngquist
 Date: 10/26/2024
 Last Modified: 10/26/2024
 '''
@@ -17,5 +17,11 @@ def load(ui_manager):
                 ui_manager.cookie_count = int(line.strip())
             else:
                 item = line.split(':')
-                ui_manager.shop_items[item[0].strip('"')].purchased_count = int(item[1].strip())
+                item_name = item[0].strip('"')
+                purchased_count = int(item[1].strip())
+                
+                shop_item = ui_manager.shop_items[item_name]
+                shop_item.purchased_count = purchased_count
+                
+                ui_manager.upgrades_acquired.append(shop_item)
 

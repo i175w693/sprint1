@@ -2,6 +2,9 @@
 
 ## Person Hours
 
+### Jack Youngquist
+- .5 (10/23)
+- 2 (10/27)
 ### Peter Pham
 
 - .5 (10/27)
