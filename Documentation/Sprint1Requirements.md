@@ -19,8 +19,8 @@
   - [X] Ability to load any save
 - [X] Main Menu Screen
   - [X] Buttons
-- [ ] Purchase Display
+- [X] Purchase Display
   - [ ] Upgrade Sprites
   - [X] Keep track of how many times an upgrade has been purchased
-  - [ ] Display amount of times an upgrade has been purchased
+  - [X] Display amount of times an upgrade has been purchased
 - [ ] Documentation 
