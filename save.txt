@@ -1,4 +1,4 @@
-4478
+6704
 "Extra Hands":7
 "Grandma":5
 "Factory":7

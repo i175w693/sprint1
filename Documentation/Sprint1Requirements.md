@@ -23,4 +23,4 @@
   - [ ] Upgrade Sprites
   - [X] Keep track of how many times an upgrade has been purchased
   - [X] Display amount of times an upgrade has been purchased
-- [ ] Documentation 
+- [X] Documentation

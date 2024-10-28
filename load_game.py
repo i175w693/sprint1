@@ -9,6 +9,7 @@ Date: 10/26/2024
 Last Modified: 10/26/2024
 '''
 
+# function to load the user's save file (currently hardcoded to save.txt)
 def load(ui_manager):
     with open('save.txt', 'r') as file:
         for number, line in enumerate(file):
