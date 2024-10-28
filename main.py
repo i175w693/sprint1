@@ -16,5 +16,6 @@ def main():
     game = Game()
     game.run()
 
+# ensures this is the main entrypoint for the program
 if __name__ == '__main__':
     main()

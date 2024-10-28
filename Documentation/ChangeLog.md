@@ -1,5 +1,11 @@
 # Change Log
 
+## October 27 (Sprint 1)
+
+### Added
+
+- Documentation for all of the game's files and functions **(Peter)**
+
 ## October 26 (Sprint 1)
 
 ### Added

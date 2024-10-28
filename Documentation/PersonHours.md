@@ -4,6 +4,7 @@
 
 ### Peter Pham
 
+- .5 (10/27)
 - 4.5 (10/26)
 
 ### Ian Wilson
@@ -17,6 +18,6 @@
 ### Michael Oliver
 
 - 2.5 (10/25)
-- 2 (10/27) 
+- 2 (10/27)
 
 ### Jack Youngquist
