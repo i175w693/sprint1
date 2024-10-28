@@ -24,4 +24,3 @@ def load(ui_manager):
                 shop_item.purchased_count = purchased_count
                 
                 ui_manager.upgrades_acquired.append(shop_item)
-

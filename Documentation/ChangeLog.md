@@ -10,6 +10,7 @@
 
 - handle_shop_click to check if an item is already in upgrades acquired to avoid filling the UI with duplicate upgrades **(Jack)**
 - draw_upgrades to display cpc or cps depending on the item **(Jack)**
+- Fixed bug when displaying purchased items of a loaded save file **(Peter)**
 
 ## October 26 (Sprint 1)
 
