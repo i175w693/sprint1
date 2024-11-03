@@ -1,4 +1,11 @@
 # Change Log
+
+## November 3 (Sprint 2)
+
+### Added
+
+- Sprint 2 documentation
+
 ## October 27 (Sprint 1)
 
 ### Added
