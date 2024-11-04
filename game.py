@@ -18,6 +18,7 @@ from shop import ShopItem
 from cookie import Cookie
 from save_game import save
 from load_game import load
+from sound import SoundManager
 
 # Initialize pygame's video system
 pygame.init()
@@ -62,9 +63,11 @@ class UIManager:
         self.show_settings_popup = False
         self.main_menu_buttons = self.create_main_menu_buttons()  # Initialize with buttons
         self.save_button = SmallButton(self.WIDTH - int(self.WIDTH * 0.1), self.HEIGHT - int(self.HEIGHT * 0.1), "Save")
+        self.sound_manager = SoundManager()
 
     """Check if a specific button was clicked based on label and mouse position."""
     def button_clicked(self, label, mouse_pos):
+        self.sound_manager.play_sound("menu-click")
         for button in self.main_menu_buttons:
             if button.text == label and button.is_clicked(mouse_pos):
                 return True
@@ -105,6 +108,7 @@ class UIManager:
     # function to handle to cookies earned per click
     def handle_cookie_click(self):
         self.cookie_count += self.cookie_per_click
+        self.sound_manager.play_sound("click")
         # print(f"Cookie clicked! Total cookies: {self.cookie_count}")  # Log message for cookie clicks
 
     # function to handle the purchase of upgrades from the shop
@@ -117,6 +121,10 @@ class UIManager:
                 button.count = item.purchased_count  # Update button's count display
                 if item not in self.upgrades_acquired:
                     self.upgrades_acquired.append(item)  # Add the item if it doesn't exist
+                self.sound_manager.play_sound("shop")
+    
+    def handle_save_click(self):
+        self.sound_manager.play_sound("menu-click")
 
     # returns the amount of cookies the user should be earning per second based on the purchased items
     def cookies_per_second(self):
@@ -287,8 +295,9 @@ class Game:
                         self.ui_manager.handle_cookie_click()
                         self.ui_manager.draw_text(f"+{self.ui_manager.cookie_per_click}", self.ui_manager.font, BLACK, int(mouse_pos[0]), int(mouse_pos[1]))
                     
-                    # Check if save button is clicked
+                    # Check if save button is clicked - IMPORTANT make this a function 
                     if self.ui_manager.save_button.is_clicked(mouse_pos):
+                        self.ui_manager.handle_save_click()
                         save(self.ui_manager)  # Call save function
 
                     self.ui_manager.handle_shop_click(mouse_pos)
