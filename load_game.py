@@ -25,6 +25,8 @@ def load(ui_manager):
                     shop_item.purchased_count = purchased_count
                     
                     ui_manager.upgrades_acquired.append(shop_item)
+                    return True
     # if not save file exists, return and start a new game
     except FileNotFoundError:
+        print(f'Save file not found!')
         return None
