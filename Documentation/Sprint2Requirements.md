@@ -22,5 +22,5 @@
 - [ ] UI Adjustments
   - [ ] Fix centering probably
   - [ ] Cost labels
-- [ ] Sound Effects
-  - [ ] Cookie click, cookie gain, button click
+- [X] Sound Effects
+  - [X] Cookie click, cookie gain, button click
