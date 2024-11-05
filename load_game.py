@@ -9,12 +9,16 @@ Date: 10/26/2024
 Last Modified: 10/26/2024
 '''
 
+import time
+
 # function to load the user's save file (currently hardcoded to save.txt)
 def load(ui_manager):
     try:
         with open('save.txt', 'r') as file:
             for number, line in enumerate(file):
                 if number == 0:
+                    time_diff = time.time() - float(line.strip())
+                elif number == 1:
                     ui_manager.cookie_count = int(line.strip())
                 else:
                     item = line.split(':')
@@ -25,8 +29,15 @@ def load(ui_manager):
                     shop_item.purchased_count = purchased_count
                     
                     ui_manager.upgrades_acquired.append(shop_item)
-                    return True
+            bonus_cookies = time_diff / 100
+            ui_manager.cookie_count += round(bonus_cookies * ui_manager.cookies_per_second())
+            return True
     # if not save file exists, return and start a new game
     except FileNotFoundError:
         print(f'Save file not found!')
         return None
+    
+
+                # if current_time - self.last_time >= 1:
+                #     self.ui_manager.cookie_count += self.ui_manager.cookies_per_second()
+                #     self.last_time = current_time

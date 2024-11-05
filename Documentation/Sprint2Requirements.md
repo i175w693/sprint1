@@ -3,7 +3,7 @@
 ## TODO
 
 - [ ] In-game Menu
-- [ ] Offline Production
+- [X] Offline Production
 - [ ] Upgrades: Auto Clicker
   - [ ] Upgrade 1
   - [ ] Upgrade 2
