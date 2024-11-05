@@ -1,10 +1,17 @@
 # Change Log
 
+## November 5 (Sprint 2)
+
+### Added
+
+-Added custom mouse cursor **(Jack)**
+
 ## November 4 (Sprint 2)
 
 ### Added
 
 - Added offline production **(Peter)**
+- Added sprite assets **(Jack)**
 
 ## November 3 (Sprint 2)
 
