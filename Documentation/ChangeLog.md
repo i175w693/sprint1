@@ -4,7 +4,8 @@
 
 ### Added
 
--Added custom mouse cursor **(Jack)**
+- Added custom mouse cursor **(Jack)**
+- Attempted to integrate button backgrounds, need to fix centering **(Peter)**
 
 ## November 4 (Sprint 2)
 

@@ -77,15 +77,18 @@ class UIManager:
     
     """Create main menu buttons and positions them on the screen."""
     def create_main_menu_buttons(self):
-        button_labels = ["Continue", "New Game", "Settings", "Exit"]
+        button_labels = [("Continue", 'assets/menu/continue_button/Continue Button2.png'),
+                         ("New Game", 'assets/menu/play_button/play button2.png'),
+                         ("Settings", 'assets/menu/options_button/options button2.png'),
+                         ("Exit", 'assets/menu/exit_button/Exit button2.png')]
         buttons = []
-        # renders each button on the screen with hardcoded position coordinates to be located on the right side of the screen
+        # renders each button on the screen with hardcoded position coordinates
         for idx, label in enumerate(button_labels):
             y_pos = int(self.HEIGHT * 0.2) + idx * int(self.HEIGHT * 0.12)
-            button_width = int(self.WIDTH * 0.4)
-            button_height = int(self.HEIGHT * 0.1)
+            button_width = int(self.WIDTH * 0.3)
+            button_height = int(self.HEIGHT * 0.2)
             x_pos = (self.WIDTH - button_width) // 2
-            button = LargeButton(self.screen, x_pos, y_pos, label, button_width, button_height)
+            button = LargeButton(self.screen, x_pos, y_pos, label[0], button_width, button_height, label[1])
             buttons.append(button)
         return buttons
     
