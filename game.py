@@ -345,6 +345,6 @@ class Game:
             self.cursor.update()
             self.cursor.draw()
             pygame.display.flip() # updates the screen in Pygame
-            self.clock.tick(20) # limits the game to 20 ticks per second
+            self.clock.tick(30) # limits the game to 30 ticks per second
 
 
