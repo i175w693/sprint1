@@ -19,6 +19,7 @@ from cookie import Cookie
 from save_game import save
 from load_game import load
 from sound import SoundManager
+from cursor import Cursor
 
 # Initialize pygame's video system
 pygame.init()
@@ -64,6 +65,7 @@ class UIManager:
         self.main_menu_buttons = self.create_main_menu_buttons()  # Initialize with buttons
         self.save_button = SmallButton(self.WIDTH - int(self.WIDTH * 0.1), self.HEIGHT - int(self.HEIGHT * 0.1), "Save")
         self.sound_manager = SoundManager()
+        self.no_cursor = pygame.mouse.set_visible(False)
 
     """Check if a specific button was clicked based on label and mouse position."""
     def button_clicked(self, label, mouse_pos):
@@ -251,6 +253,7 @@ class Game:
         self.cookie = Cookie(f"{ASSETS_FILEPATH}/cookie.png", 0.2, self.ui_manager.WIDTH, self.ui_manager.HEIGHT)
         self.last_time = time.time()
         self.clock = pygame.time.Clock()
+        self.cursor = Cursor(f"{ASSETS_FILEPATH}/cursor/cursor1.png", 1, 64, 64)
 
     # checks each event that occurs in pygame and updates the game accordingly.
     def handle_events(self):
@@ -293,7 +296,7 @@ class Game:
                     # Handle game-related clicks
                     if self.cookie.rect.collidepoint(mouse_pos):
                         self.ui_manager.handle_cookie_click()
-                        self.ui_manager.draw_text(f"+{self.ui_manager.cookie_per_click}", self.ui_manager.font, BLACK, int(mouse_pos[0]), int(mouse_pos[1]))
+                        self.ui_manager.draw_text(f"+{self.ui_manager.cookie_per_click}", self.ui_manager.font, BLACK, int(mouse_pos[0]-26), int(mouse_pos[1]-30))
                     
                     # Check if save button is clicked - IMPORTANT make this a function 
                     if self.ui_manager.save_button.is_clicked(mouse_pos):
@@ -338,6 +341,9 @@ class Game:
 
             # Handle events and update display
             self.handle_events()
+            # Handle cursor sprite movement
+            self.cursor.update()
+            self.cursor.draw()
             pygame.display.flip() # updates the screen in Pygame
             self.clock.tick(20) # limits the game to 20 ticks per second
 
