@@ -1,5 +1,11 @@
 # Change Log
 
+## November 4 (Sprint 2)
+
+### Added
+
+- Added offline production **(Peter)**
+
 ## November 3 (Sprint 2)
 
 ### Added
