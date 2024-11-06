@@ -5,6 +5,7 @@
 ### Added
 
 - Added new upgrades for auto clickers **(Peter)**
+- Added new upgrades for click multipliers **(Andrew)**
 
 ### Modified
 
