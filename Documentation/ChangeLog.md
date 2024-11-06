@@ -1,5 +1,15 @@
 # Change Log
 
+## November 6 (Sprint 2)
+
+### Added
+
+- Added new upgrades for auto clickers **(Peter)**
+
+### Modified
+
+- Moved shop items to the shop class file **(Peter)**
+
 ## November 5 (Sprint 2)
 
 ### Added

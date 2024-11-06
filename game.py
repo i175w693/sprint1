@@ -14,7 +14,7 @@ import sys
 import time
 
 # imports necessary functions and classes from the other python files
-from shop import ShopItem
+from shop import shop_items
 from cookie import Cookie
 from save_game import save
 from load_game import load
@@ -47,11 +47,7 @@ class UIManager:
         self.cookie_count = 0
         self.upgrades_acquired = []
         # initializes the shop's items
-        self.shop_items = {
-            'Extra Hands': ShopItem("Extra Hands", 100, None, 2),
-            'Grandma': ShopItem("Grandma", 100, 1, None),
-            'Factory': ShopItem("Factory", 500, 5, None)
-        }
+        self.shop_items = shop_items
         self.cookie_per_click = 1
         # Set up screen to dynamically fetch the display's width and height
         self.screen = pygame.display.set_mode((self.WIDTH, self.HEIGHT), pygame.RESIZABLE)  # Allows resizing
