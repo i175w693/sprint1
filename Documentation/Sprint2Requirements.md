@@ -9,10 +9,10 @@
     - [X] Upgrade 1
     - [X] Upgrade 2
     - [X] Upgrade 3
-  - [ ] Upgrades: Click Multipliers
-    - [ ] Upgrade 1
-    - [ ] Upgrade 2
-    - [ ] Upgrade 3
+  - [X] Upgrades: Click Multipliers
+    - [X] Upgrade 1
+    - [X] Upgrade 2
+    - [X] Upgrade 3
   - [ ] Upgrades: More Cookies/Click
     - [ ] Upgrade 1
     - [ ] Upgrade 2

@@ -37,5 +37,7 @@ shop_items = {
 }
 
 shop_upgrades = {
-
+    'Click Multiplier 1': ShopUpgrade("Click Multiplier 1", 200, None, 1.05),
+    'Click Multiplier 2': ShopUpgrade("Click Multiplier 2", 500, None, 1.15),
+    'Click Multiplier 3': ShopUpgrade("Click Multiplier 3", 1000, None, 1.35),
 }

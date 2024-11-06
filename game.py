@@ -14,7 +14,7 @@ import sys
 import time
 
 # imports necessary functions and classes from the other python files
-from shop import shop_items
+from shop import shop_items, shop_upgrades
 from cookie import Cookie
 from save_game import save
 from load_game import load
@@ -62,6 +62,9 @@ class UIManager:
         self.save_button = SmallButton(self.WIDTH - int(self.WIDTH * 0.1), self.HEIGHT - int(self.HEIGHT * 0.1), "Save")
         self.sound_manager = SoundManager()
         self.no_cursor = pygame.mouse.set_visible(False)
+        self.base_cookie_per_click = 1  # Start with 1 base cookie per click
+        self.click_multiplier = 1.0     # Multiplier starts at 1.0 (no effect initially)
+        self.cookie_per_click = self.base_cookie_per_click * self.click_multiplier
 
     """Check if a specific button was clicked based on label and mouse position."""
     def button_clicked(self, label, mouse_pos):
@@ -96,7 +99,10 @@ class UIManager:
     # function to render the buttons on the screen for each of the shop's items
     def create_buttons(self):
         buttons = []
-        for idx, (k, v) in enumerate(self.shop_items.items()):
+        # Loop through both shop items and upgrades
+        all_shop_items = {**shop_items, **shop_upgrades}  # Merges both dictionaries
+
+        for idx, (k, v) in enumerate(all_shop_items.items()):
             button_width = int(self.WIDTH * 0.15)  # Adjust the width as needed
             button_height = int(self.HEIGHT * 0.05)  # Adjust the height as needed
             button = LargeButton(self.screen, 
@@ -122,6 +128,14 @@ class UIManager:
                 button.count = item.purchased_count  # Update button's count display
                 if item not in self.upgrades_acquired:
                     self.upgrades_acquired.append(item)  # Add the item if it doesn't exist
+                # Check if the item is a click multiplier
+                if item.name.startswith("Click Multiplier"):
+                    self.click_multiplier *= item.cpc  # Multiply the existing multiplier by the new multiplier
+                elif item.cpc is not None:
+                    self.base_cookie_per_click += item.cpc  # Only increase base cookies per click
+                
+                # Recalculate the total cookies per click
+                self.cookie_per_click = self.base_cookie_per_click * self.click_multiplier
                 self.sound_manager.play_sound("shop")
     
     def handle_save_click(self):
@@ -133,14 +147,17 @@ class UIManager:
     
     # returns the amount of cookies the user should be earning for each click based on their purchased items
     def cookies_per_click(self):
-        if (1 * sum(item.cpc * item.purchased_count for item in self.shop_items.values() if item.cpc != None)) == 0:
-            self.cookie_per_click = 1
-        else:
-            self.cookie_per_click = 1 * sum(item.cpc * item.purchased_count for item in self.shop_items.values() if item.cpc != None)
+        # Calculate the base cookies per click from purchased items
+        base_cpc = sum(item.cpc * item.purchased_count for item in self.shop_items.values() if item.cpc is not None)  
+        # If no items affecting CPC are purchased, set the base to 1
+        if base_cpc == 0:
+            base_cpc = 1
+        # Apply the click multiplier to the base cookies per click
+        self.cookie_per_click = base_cpc * self.click_multiplier
 
     # renders the user's balance on the top left of the screen
     def draw_stats(self, screen):
-        self.draw_text(f"Cookies: {self.cookie_count}", self.font, BLACK, int(self.WIDTH * 0.01), int(self.HEIGHT * 0.01))
+        self.draw_text(f"Cookies: {self.cookie_count} (+{self.cookie_per_click} per click)", self.font, BLACK, int(self.WIDTH * 0.01), int(self.HEIGHT * 0.01))
 
     # renders the purchased item's to the middle column (will be replaced with sprites in the future).
     def draw_upgrades(self, screen):
