@@ -1,5 +1,10 @@
 # Change Log
 
+## November 7 (Sprint 2)
+
+### Added
+
+- Added sprites into main menu **(Jack)**
 ## November 6 (Sprint 2)
 
 ### Added
