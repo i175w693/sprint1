@@ -19,7 +19,7 @@ def load(ui_manager):
                 if number == 0:
                     time_diff = time.time() - float(line.strip())
                 elif number == 1:
-                    ui_manager.cookie_count = int(line.strip())
+                    ui_manager.cookie_count = float(line.strip())
                 else:
                     item = line.split(':')
                     item_name = item[0].strip('"')
