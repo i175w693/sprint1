@@ -48,7 +48,6 @@ class UIManager:
         self.upgrades_acquired = []
         # initializes the shop's items
         self.shop_items = shop_items
-        self.cookie_per_click = 1
         # Set up screen to dynamically fetch the display's width and height
         self.screen = pygame.display.set_mode((self.WIDTH, self.HEIGHT), pygame.RESIZABLE)  # Allows resizing
         pygame.display.set_caption("Cookie Clicker")
@@ -65,6 +64,9 @@ class UIManager:
         self.base_cookie_per_click = 1  # Start with 1 base cookie per click
         self.click_multiplier = 1.0     # Multiplier starts at 1.0 (no effect initially)
         self.cookie_per_click = self.base_cookie_per_click * self.click_multiplier
+        self.scroll_offset = 0  # Initialize scroll offset
+        self.max_scroll_offset = 0  # Initialize max scroll offset
+        self.scroll_speed = 20  # Initialize scroll speed
 
     """Check if a specific button was clicked based on label and mouse position."""
     def button_clicked(self, label, mouse_pos):
@@ -99,16 +101,19 @@ class UIManager:
     # function to render the buttons on the screen for each of the shop's items
     def create_buttons(self):
         buttons = []
-        # Loop through both shop items and upgrades
-        all_shop_items = {**shop_items, **shop_upgrades}  # Merges both dictionaries
+        all_shop_items = {**shop_items, **shop_upgrades}
+        button_height = int(self.HEIGHT * 0.05)
+        button_margin = int(self.HEIGHT * 0.01)  # Add a margin between buttons
+        total_height = len(all_shop_items) * (button_height + button_margin)
+        self.max_scroll_offset = max(0, total_height - int(self.HEIGHT * 0.8))  # Calculate max scroll offset
 
         for idx, (k, v) in enumerate(all_shop_items.items()):
-            button_width = int(self.WIDTH * 0.15)  # Adjust the width as needed
-            button_height = int(self.HEIGHT * 0.05)  # Adjust the height as needed
+            button_width = int(self.WIDTH * 0.15)
+            button_y = int(self.HEIGHT * 0.15) + idx * (button_height + button_margin) - self.max_scroll_offset
             button = LargeButton(self.screen, 
-                                self.WIDTH - int(self.WIDTH * 0.25), 
-                                int(self.HEIGHT * 0.15) + idx * int(self.HEIGHT * 0.1), 
-                                v.name, button_width, button_height)  # Use new width and height
+                                 self.WIDTH - int(self.WIDTH * 0.25), 
+                                 button_y, 
+                                 v.name, button_width, button_height)
             buttons.append((button, v))
         return buttons
 
@@ -128,14 +133,23 @@ class UIManager:
                 button.count = item.purchased_count  # Update button's count display
                 if item not in self.upgrades_acquired:
                     self.upgrades_acquired.append(item)  # Add the item if it doesn't exist
-                # Check if the item is a click multiplier
+                
+                # Debugging: Print item details
+                # print(f"Purchased: {item.name}, CPC: {item.cpc}, Multiplier: {self.click_multiplier}")
+
+                # Check if the item is a click multiplier or more cookies per click
                 if item.name.startswith("Click Multiplier"):
-                    self.click_multiplier *= item.cpc  # Multiply the existing multiplier by the new multiplier
+                    self.click_multiplier *= item.cpc
+                elif item.name.startswith("Increase Click"):
+                    self.base_cookie_per_click += item.cpc
                 elif item.cpc is not None:
-                    self.base_cookie_per_click += item.cpc  # Only increase base cookies per click
+                    self.base_cookie_per_click += item.cpc
                 
                 # Recalculate the total cookies per click
                 self.cookie_per_click = self.base_cookie_per_click * self.click_multiplier
+
+                # Debugging: Print recalculated cookie per click
+                # print(f"New Cookie Per Click: {self.cookie_per_click}")
                 self.sound_manager.play_sound("shop")
     
     def handle_save_click(self):
@@ -145,19 +159,21 @@ class UIManager:
     def cookies_per_second(self):
         return sum(item.cps * item.purchased_count for item in self.shop_items.values() if item.cps != None)
     
+    # This function isn't actually used anywhere in the code, but it's here if we want to use it in the future, it was messing with the upgrade implementation
     # returns the amount of cookies the user should be earning for each click based on their purchased items
     def cookies_per_click(self):
-        # Calculate the base cookies per click from purchased items
-        base_cpc = sum(item.cpc * item.purchased_count for item in self.shop_items.values() if item.cpc is not None)  
-        # If no items affecting CPC are purchased, set the base to 1
-        if base_cpc == 0:
-            base_cpc = 1
-        # Apply the click multiplier to the base cookies per click
-        self.cookie_per_click = base_cpc * self.click_multiplier
+        pass
+        # # Calculate the base cookies per click from purchased items
+        # base_cpc = sum(item.cpc * item.purchased_count for item in self.shop_items.values() if item.cpc is not None)  
+        # # If no items affecting CPC are purchased, set the base to 1
+        # if base_cpc == 0:
+        #     base_cpc = 1
+        # # Apply the click multiplier to the base cookies per click
+        # self.cookie_per_click = base_cpc * self.click_multiplier
 
     # renders the user's balance on the top left of the screen
     def draw_stats(self, screen):
-        self.draw_text(f"Cookies: {self.cookie_count} (+{self.cookie_per_click} per click)", self.font, BLACK, int(self.WIDTH * 0.01), int(self.HEIGHT * 0.01))
+        self.draw_text(f"Cookies: {self.cookie_count:.3f} (+{self.cookie_per_click:.3f} per click)", self.font, BLACK, int(self.WIDTH * 0.01), int(self.HEIGHT * 0.01))
 
     # renders the purchased item's to the middle column (will be replaced with sprites in the future).
     def draw_upgrades(self, screen):
@@ -172,11 +188,17 @@ class UIManager:
 
     # draws the shop section of the screen
     def draw_shop(self, screen):
-        font_size = int(self.WIDTH * 0.03)  # Dynamic font size based on width
+        font_size = int(self.WIDTH * 0.03)
         font = get_font(font_size)
         self.draw_text("Shop:", font, BLACK, int(self.WIDTH * 0.75), int(self.HEIGHT * 0.05))
+        
+        # Draw shop items
         for button, _ in self.buttons:
-            button.draw(screen)  # Draw each button
+            if 0 <= button.y <= self.HEIGHT:  # Only draw buttons within the visible area
+                button.draw(screen)
+
+        # Draw scroll bar
+        self.draw_scroll_bar(screen)
 
     # Draws vertical lines to partition the screen
     def draw_partitions(self, screen):
@@ -252,6 +274,27 @@ class UIManager:
         checkbox_y = y
         pygame.draw.rect(self.screen, BLACK, (checkbox_x, checkbox_y, checkbox_side, checkbox_side))
         
+    def draw_scroll_bar(self, screen):
+        bar_width = int(self.WIDTH * 0.02)
+        bar_height = int(self.HEIGHT * 0.8)
+        bar_x = self.WIDTH - bar_width - 10
+        bar_y = int(self.HEIGHT * 0.15)
+        
+        # Draw the scroll bar background
+        pygame.draw.rect(screen, GRAY, (bar_x, bar_y, bar_width, bar_height))
+        
+        # Calculate the scroll handle position
+        handle_height = max(20, bar_height * (bar_height / (bar_height + self.max_scroll_offset)))
+        
+        # Prevent division by zero
+        if self.max_scroll_offset > 0:
+            handle_y = bar_y + (self.scroll_offset / self.max_scroll_offset) * (bar_height - handle_height)
+        else:
+            handle_y = bar_y  # Default position if no scrolling is needed
+        
+        # Draw the scroll handle
+        pygame.draw.rect(screen, BLACK, (bar_x, handle_y, bar_width, handle_height))
+
     def run_main_menu(self):
         # Display either the main menu, saves, or settings based on flags
         if self.show_main_menu:
@@ -260,6 +303,15 @@ class UIManager:
             self.draw_save_slots()
         elif self.show_settings_popup:
             self.draw_settings_popup()
+
+    def handle_events(self):
+        for event in pygame.event.get():
+            ...
+            # Handle mouse wheel scrolling
+            if event.type == pygame.MOUSEWHEEL:
+                self.scroll_offset -= event.y * self.scroll_speed
+                self.scroll_offset = max(0, min(self.scroll_offset, self.max_scroll_offset))
+            ...
 
 # Main game class
 class Game:
@@ -312,7 +364,7 @@ class Game:
                     # Handle game-related clicks
                     if self.cookie.rect.collidepoint(mouse_pos):
                         self.ui_manager.handle_cookie_click()
-                        self.ui_manager.draw_text(f"+{self.ui_manager.cookie_per_click}", self.ui_manager.font, BLACK, int(mouse_pos[0]-26), int(mouse_pos[1]-30))
+                        self.ui_manager.draw_text(f"+{self.ui_manager.cookie_per_click:.3f}", self.ui_manager.font, BLACK, int(mouse_pos[0]-26), int(mouse_pos[1]-30))
                     
                     # Check if save button is clicked - IMPORTANT make this a function 
                     if self.ui_manager.save_button.is_clicked(mouse_pos):
@@ -327,6 +379,11 @@ class Game:
                 self.ui_manager.screen = pygame.display.set_mode((self.ui_manager.WIDTH, self.ui_manager.HEIGHT), pygame.RESIZABLE)
                 self.cookie = Cookie(f"{ASSETS_FILEPATH}/cookie.png", 0.2, self.ui_manager.WIDTH, self.ui_manager.HEIGHT)
                 self.ui_manager = UIManager()
+
+            # Handle mouse wheel scrolling
+            if event.type == pygame.MOUSEWHEEL:
+                self.ui_manager.scroll_offset -= event.y * self.ui_manager.scroll_speed
+                self.ui_manager.scroll_offset = max(0, min(self.ui_manager.scroll_offset, self.ui_manager.max_scroll_offset))
 
     # Begins the game and runs in a continuous loop
     def run(self):
