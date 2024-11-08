@@ -1,10 +1,19 @@
 # Change Log
 
+## November 8 (Sprint 2)
+
+### Added
+
+- Total cookies and cookies per click are now displayed with 3 decimal places **(Andrew)**
+- Implemented more cookies per click **(Andrew)**
+- Added scrolling to the shop **(Andrew)**
+
 ## November 7 (Sprint 2)
 
 ### Added
 
 - Added sprites into main menu **(Jack)**
+
 ## November 6 (Sprint 2)
 
 ### Added

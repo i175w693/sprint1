@@ -20,6 +20,8 @@ class Button:
         self.text = text
         self.font = get_font(font_size)
         self.image_file = image_file
+        self.x = x
+        self.y = y
 
     # Function to draw text
     def draw_text(self, text, font, color, x, y, screen):
@@ -52,6 +54,8 @@ class SmallButton(Button):
 class LargeButton(Button):
     def __init__(self, screen, x, y, text, width, height, image_file = None):
         self.screen = screen  # Store screen reference
+        self.x = x
+        self.y = y  # Ensure y is stored
         super().__init__(x, y, width, height, text, int(height * 0.5), image_file)  # Initialize the base class
 
     def draw(self, screen):
