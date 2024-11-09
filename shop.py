@@ -31,7 +31,7 @@ class ShopUpgrade:
 
 # price = base x 1.15 ^ (buildings owned)
 shop_items = {
-    'Extra Hands': ShopItem("Extra Hands", 10, None, 2),
+    'Extra Hands': ShopItem("Extra Hands", 10, None, .1), # Made upgrade more reasonable
     'Cursor': ShopItem("Cursor", 50, .5, None),
     'Grandma': ShopItem("Grandma", 100, 1, None),
     'Farm': ShopItem("Farm", 500, 5, None),

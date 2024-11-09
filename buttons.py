@@ -14,7 +14,6 @@ from game import get_font, WHITE, BUTTON_COLOR
 
 # Base class for buttons
 class Button:
-    # initializes the button's dimensions, text, and font
     def __init__(self, x, y, width, height, text, font_size, image_file):
         self.rect = pygame.Rect(x, y, width, height)
         self.text = text
@@ -22,24 +21,28 @@ class Button:
         self.image_file = image_file
         self.x = x
         self.y = y
+        self.clicked = False  # Flag to check if the button was clicked
 
-    # Function to draw text
     def draw_text(self, text, font, color, x, y, screen):
         text_obj = font.render(text, True, color)
         screen.blit(text_obj, (x, y))
 
-    # Function to draw the rectangle
     def draw(self, screen):
-        if self.image_file != None:
+        if self.image_file is not None:
             IMAGE = pygame.transform.scale(pygame.image.load(self.image_file).convert_alpha(), (self.rect.width, self.rect.height))
             screen.blit(IMAGE, self.rect)
         else:
             pygame.draw.rect(screen, BUTTON_COLOR, self.rect)
             self.draw_text(self.text, self.font, WHITE, self.rect.x + 10, self.rect.y + 5, screen)
 
-    # Function to detect if the cookie has been clicked
     def is_clicked(self, mouse_pos):
+        """Returns True if the button is clicked and the mouse position is over the button."""
         return self.rect.collidepoint(mouse_pos)
+
+    def reset_click(self):
+        """Resets the click state to allow a new click to be registered."""
+        self.clicked = False
+
 
 
 # Small Button class
