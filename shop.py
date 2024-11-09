@@ -13,6 +13,7 @@ Last Modified: 10/26/2024
 class ShopItem:
     def __init__(self, name, base_cost, cps, cpc):
         self.name = name # Item Name
+        self.base_cost = base_cost # Starting cost 
         self.cost = base_cost # Cost to purchase
         self.cps = cps # Cookies per second
         self.cpc = cpc # Cookies per click (multiple)
@@ -22,6 +23,7 @@ class ShopItem:
 class ShopUpgrade:
     def __init__(self, name, base_cost, cps, cpc):
         self.name = name # Item Name
+        self.base_cost = base_cost # Starting cost 
         self.cost = base_cost # Cost to purchase
         self.cps = cps # Cookies per second
         self.cpc = cpc # Cookies per click (multiple)
