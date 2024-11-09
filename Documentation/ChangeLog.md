@@ -7,6 +7,13 @@
 - Total cookies and cookies per click are now displayed with 3 decimal places **(Andrew)**
 - Implemented more cookies per click **(Andrew)**
 - Added scrolling to the shop **(Andrew)**
+- Added dynamic pricing and display to shop upgrades **(Ian)**
+
+### Modified
+
+- Fixed infinite upgrade bug by adding a lock and unlock for upgrades to prevent outpacing the cookie count calculator **(Ian)** 
+- Fixed Cookies per click not tracking between saves **(Ian)**
+- Fixed cookies per click upgrades not tracking between saves **(Ian)**
 
 ## November 7 (Sprint 2)
 
