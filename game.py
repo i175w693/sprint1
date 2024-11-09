@@ -48,6 +48,8 @@ class UIManager:
         self.upgrades_acquired = []
         # initializes the shop's items
         self.shop_items = shop_items
+        # initializes the shop's upgrades
+        self.shop_upgrades = shop_upgrades
         # Set up screen to dynamically fetch the display's width and height
         self.screen = pygame.display.set_mode((self.WIDTH, self.HEIGHT), pygame.RESIZABLE)  # Allows resizing
         pygame.display.set_caption("Cookie Clicker")
@@ -61,7 +63,7 @@ class UIManager:
         self.save_button = SmallButton(self.WIDTH - int(self.WIDTH * 0.1), self.HEIGHT - int(self.HEIGHT * 0.1), "Save")
         self.sound_manager = SoundManager()
         self.no_cursor = pygame.mouse.set_visible(False)
-        self.base_cookie_per_click = 1  # Start with 1 base cookie per click
+        self.base_cookie_per_click = 1 # Start with 1 base cookie per click
         self.click_multiplier = 1.0     # Multiplier starts at 1.0 (no effect initially)
         self.cookie_per_click = self.base_cookie_per_click * self.click_multiplier
         self.scroll_offset = 0  # Initialize scroll offset
@@ -125,32 +127,41 @@ class UIManager:
 
     # function to handle the purchase of upgrades from the shop
     def handle_shop_click(self, mouse_pos):
-        # iterates through the shop items and checks if the user is attemping to purchase them.
         for button, item in self.buttons:
-            if button.is_clicked(mouse_pos) and self.cookie_count >= item.cost:
-                self.cookie_count -= item.cost
-                item.purchased_count += 1  # Increment the count for this item
-                button.count = item.purchased_count  # Update button's count display
-                if item not in self.upgrades_acquired:
-                    self.upgrades_acquired.append(item)  # Add the item if it doesn't exist
-                
-                # Debugging: Print item details
-                # print(f"Purchased: {item.name}, CPC: {item.cpc}, Multiplier: {self.click_multiplier}")
+            if button.is_clicked(mouse_pos):
+                # Calculate the current price
+                current_price = int(item.base_cost * (1.15 ** item.purchased_count))
 
-                # Check if the item is a click multiplier or more cookies per click
-                if item.name.startswith("Click Multiplier"):
-                    self.click_multiplier *= item.cpc
-                elif item.name.startswith("Increase Click"):
-                    self.base_cookie_per_click += item.cpc
-                elif item.cpc is not None:
-                    self.base_cookie_per_click += item.cpc
-                
-                # Recalculate the total cookies per click
-                self.cookie_per_click = self.base_cookie_per_click * self.click_multiplier
+                # Only proceed if the player has enough cookies
+                if self.cookie_count >= current_price:
+                    # Lock the purchase process
+                    self.processing_purchase = True
+                    
+                    # Deduct the cookie count and update purchase state
+                    self.cookie_count -= current_price
+                    item.purchased_count += 1  # Increment the purchase count
 
-                # Debugging: Print recalculated cookie per click
-                # print(f"New Cookie Per Click: {self.cookie_per_click}")
-                self.sound_manager.play_sound("shop")
+                    # Add the item to upgrades_acquired if not already in the list
+                    if item not in self.upgrades_acquired:
+                        self.upgrades_acquired.append(item)
+                    
+                    # Update button text with the new calculated price
+                    button.text = f"{item.name} - ${int(item.base_cost * (1.15 ** item.purchased_count))} cookies"
+
+                    # Apply any effects (CPC or CPS) associated with the item
+                    if item.name.startswith("Click Multiplier"):
+                        self.click_multiplier *= item.cpc
+                    elif item.name.startswith("Increase Click"):
+                        self.base_cookie_per_click += item.cpc
+                    elif item.cpc is not None:
+                        self.base_cookie_per_click += item.cpc
+                    
+                    # Recalculate cookies per click
+                    self.cookie_per_click = self.base_cookie_per_click * self.click_multiplier
+                    self.sound_manager.play_sound("shop")
+
+                    # Unlock the purchase process
+                    self.processing_purchase = False
     
     def handle_save_click(self):
         self.sound_manager.play_sound("menu-click")
@@ -180,11 +191,13 @@ class UIManager:
         font_size = int(self.WIDTH * 0.03)  # Dynamic font size based on width
         font = get_font(font_size)
         self.draw_text("Upgrades Acquired:", font, BLACK, int(self.WIDTH * 0.4), int(self.HEIGHT * 0.05))
-        for idx, upgrade in enumerate(self.upgrades_acquired):
-            if upgrade.cpc == None:
-                self.draw_text(f"{upgrade.name} (CPS: {upgrade.cps}): {upgrade.purchased_count}", font, BLACK, int(self.WIDTH * 0.4), int(self.HEIGHT * 0.15) + idx * int(self.HEIGHT * 0.05))
-            else:
-                self.draw_text(f"{upgrade.name} (CPC: {upgrade.cpc}): {upgrade.purchased_count}", font, BLACK, int(self.WIDTH * 0.4), int(self.HEIGHT * 0.15) + idx * int(self.HEIGHT * 0.05))
+        if self.upgrades_acquired:
+            for idx, upgrade in enumerate(self.upgrades_acquired):
+                if upgrade.cpc is None:
+                    self.draw_text(f"{upgrade.name} (CPS: {upgrade.cps}): {upgrade.purchased_count}", font, BLACK, int(self.WIDTH * 0.4), int(self.HEIGHT * 0.15) + idx * int(self.HEIGHT * 0.05))
+                else:
+                    self.draw_text(f"{upgrade.name} (CPC: {upgrade.cpc}): {upgrade.purchased_count}", font, BLACK, int(self.WIDTH * 0.4), int(self.HEIGHT * 0.15) + idx * int(self.HEIGHT * 0.05))
+
 
     # draws the shop section of the screen
     def draw_shop(self, screen):
@@ -193,9 +206,12 @@ class UIManager:
         self.draw_text("Shop:", font, BLACK, int(self.WIDTH * 0.75), int(self.HEIGHT * 0.05))
         
         # Draw shop items
-        for button, _ in self.buttons:
+        for button, item in self.buttons:
             if 0 <= button.y <= self.HEIGHT:  # Only draw buttons within the visible area
                 button.draw(screen)
+            current_price = int(item.base_cost * (1.15 ** item.purchased_count))
+            button.text = f"{item.name} - {current_price} cookies"
+            button.draw(screen)
 
         # Draw scroll bar
         self.draw_scroll_bar(screen)
@@ -313,6 +329,24 @@ class UIManager:
                 self.scroll_offset = max(0, min(self.scroll_offset, self.max_scroll_offset))
             ...
 
+    def start_new_game(self):
+        # Reset cookie count and upgrades
+        self.cookie_count = 0
+        self.upgrades_acquired = []
+
+        # Reset each shop item's purchase count and price
+        for item in self.shop_items.values():
+            item.purchased_count = 0
+            item.cost = item.base_cost  # Reset to the initial base price
+
+        # Reset cookies per click and multiplier
+        self.base_cookie_per_click = 1
+        self.click_multiplier = 1.0
+        self.cookie_per_click = self.base_cookie_per_click * self.click_multiplier
+
+        # Reset any other game-related state, such as showing main menu or other flags
+        self.show_main_menu = False
+
 # Main game class
 class Game:
     # initializes the UI and time keeping functions
@@ -353,7 +387,7 @@ class Game:
                         else: # else load the save file
                             self.ui_manager.show_main_menu = False  # Hide the main menu after loading
                     elif self.ui_manager.button_clicked("New Game", mouse_pos):
-                        self.ui_manager = UIManager() # recreates a new UIManager with empty stats
+                        self.ui_manager.start_new_game()  # Start a new game with initial values
                         self.ui_manager.show_main_menu = False
                     elif self.ui_manager.button_clicked("Settings", mouse_pos):
                         self.ui_manager.show_settings_popup = True
