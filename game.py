@@ -69,6 +69,7 @@ class UIManager:
         self.scroll_offset = 0  # Initialize scroll offset
         self.max_scroll_offset = 0  # Initialize max scroll offset
         self.scroll_speed = 20  # Initialize scroll speed
+        self.show_popup = False
 
     """Check if a specific button was clicked based on label and mouse position."""
     def button_clicked(self, label, mouse_pos):
@@ -162,41 +163,104 @@ class UIManager:
 
                     # Unlock the purchase process
                     self.processing_purchase = False
-    
-    def handle_save_click(self):
-        self.sound_manager.play_sound("menu-click")
 
     # returns the amount of cookies the user should be earning per second based on the purchased items
     def cookies_per_second(self):
         return sum(item.cps * item.purchased_count for item in self.shop_items.values() if item.cps != None)
-    
-    # This function isn't actually used anywhere in the code, but it's here if we want to use it in the future, it was messing with the upgrade implementation
-    # returns the amount of cookies the user should be earning for each click based on their purchased items
-    def cookies_per_click(self):
-        pass
-        # # Calculate the base cookies per click from purchased items
-        # base_cpc = sum(item.cpc * item.purchased_count for item in self.shop_items.values() if item.cpc is not None)  
-        # # If no items affecting CPC are purchased, set the base to 1
-        # if base_cpc == 0:
-        #     base_cpc = 1
-        # # Apply the click multiplier to the base cookies per click
-        # self.cookie_per_click = base_cpc * self.click_multiplier
 
     # renders the user's balance on the top left of the screen
     def draw_stats(self, screen):
-        self.draw_text(f"Cookies: {self.cookie_count:.3f} (+{self.cookie_per_click:.3f} per click)", self.font, BLACK, int(self.WIDTH * 0.01), int(self.HEIGHT * 0.01))
+        self.draw_text(f"Cookies: {self.cookie_count:.3f}", self.font, BLACK, int(self.WIDTH * 0.01), int(self.HEIGHT * 0.01))
+        self.draw_text(f"{self.cookie_per_click:.3f} cookies per click", self.font, BLACK, int(self.WIDTH * 0.01), int(self.HEIGHT * 0.05))
 
     # renders the purchased item's to the middle column (will be replaced with sprites in the future).
     def draw_upgrades(self, screen):
         font_size = int(self.WIDTH * 0.03)  # Dynamic font size based on width
         font = get_font(font_size)
         self.draw_text("Upgrades Acquired:", font, BLACK, int(self.WIDTH * 0.4), int(self.HEIGHT * 0.05))
+
+        # Draw the "Pop-up Menu" button (to the right of the upgrades text)
+        button_width = int(self.WIDTH * 0.1)
+        button_height = int(self.HEIGHT * 0.05)
+        button_x = int(self.WIDTH * 0.5) + 150  # Position it to the right of the text
+        button_y = int(self.HEIGHT * 0.005)
+        self.popup_button = LargeButton(screen, button_x, button_y, "Open Menu", button_width, button_height)
+
+        # Draw the button on the screen
+        self.popup_button.draw(screen)
+
+        font_size = int(self.WIDTH * 0.015)  # Dynamic font size based on width
+        font = get_font(font_size)
         if self.upgrades_acquired:
             for idx, upgrade in enumerate(self.upgrades_acquired):
                 if upgrade.cpc is None:
                     self.draw_text(f"{upgrade.name} (CPS: {upgrade.cps}): {upgrade.purchased_count}", font, BLACK, int(self.WIDTH * 0.4), int(self.HEIGHT * 0.15) + idx * int(self.HEIGHT * 0.05))
                 else:
                     self.draw_text(f"{upgrade.name} (CPC: {upgrade.cpc}): {upgrade.purchased_count}", font, BLACK, int(self.WIDTH * 0.4), int(self.HEIGHT * 0.15) + idx * int(self.HEIGHT * 0.05))
+
+    # Modify this method to handle button clicks properly in the popup menu
+    def draw_popup_menu(self, screen):
+        if self.show_popup:
+            popup_width = int(self.WIDTH * 0.7)
+            popup_height = int(self.HEIGHT * 1)
+            popup_x = (self.WIDTH - popup_width) 
+            popup_y = (self.HEIGHT - popup_height) // 2  # Center the popup vertically
+            
+            # Draw the popup background
+            pygame.draw.rect(screen, GRAY, (popup_x, popup_y, popup_width, popup_height))
+
+            # Draw the title of the popup
+            title_font = get_font(int(popup_height * 0.1))
+            title_text = "Options"
+            self.draw_text(title_text, title_font, BLACK, popup_x + popup_width // 2 - title_font.size(title_text)[0] // 2, popup_y + 10)
+
+            # Define the buttons and their labels
+            button_labels = ["Save Game", "Close Menu", "Toggle Sound", "Quit"]
+            
+            # Set button properties
+            button_width = int(popup_width * 0.2)  # Adjust the button width based on the popup size
+            button_height = int(popup_height * 0.1)  # Set a reasonable button height
+
+            # Calculate the vertical position of the buttons (one row of buttons at the bottom)
+            button_y = popup_y + popup_height - button_height - 10
+            
+            # Space out the buttons horizontally based on the number of buttons
+            spacing = (popup_width - len(button_labels) * button_width) // (len(button_labels) + 1)  # Space between buttons
+
+            # Loop through the button labels and create the buttons
+            for index, label in enumerate(button_labels):
+                # Calculate the x-position of the current button
+                button_x = popup_x + (index + 1) * spacing + index * button_width
+                button = LargeButton(screen, button_x, button_y, label, button_width, button_height)
+                button.draw(screen)
+
+                # Handle the button click based on its label
+                mouse_pos = pygame.mouse.get_pos()
+                mouse_pressed = pygame.mouse.get_pressed()[0]  # Left mouse button pressed (0 = left, 1 = middle, 2 = right)
+
+                # Ensure the click is only handled once (we prevent double-clicking the button)
+                if button.is_clicked(mouse_pos) and mouse_pressed:
+                    if not hasattr(self, '_button_clicked') or not self._button_clicked:
+                        self._button_clicked = True  # Lock the button to avoid multiple triggers
+                        self.sound_manager.play_sound("menu-click")
+                        if label == "Save Game":
+                            save(self)  # Handle the save game action
+                        elif label == "Close Menu":
+                            self.show_popup = False  # Close the pop-up when the button is clicked
+                        elif label == "Toggle Sound":
+                            self.sound_manager.toggle_sound()  # Toggle sound on/off
+                        elif label == "Quit":
+                            pygame.quit()  # Quit the game
+                            quit()  # Close the game completely
+                    else:
+                        # If the button was already clicked, do nothing (debounced)
+                        pass
+
+                # Reset the click lock when the mouse button is released
+                if not mouse_pressed:
+                    if hasattr(self, '_button_clicked') and self._button_clicked:
+                        self._button_clicked = False  # Unlock the button when the button is released
+
 
 
     # draws the shop section of the screen
@@ -231,27 +295,17 @@ class UIManager:
         for button in self.main_menu_buttons:
             button.draw(self.screen)
 
-    # draws buttons onto the screen (currently unused)
-    def draw_button(self, label, y_pos):
-        # Button properties
-        button_width = int(self.WIDTH * 0.4)
-        button_height = int(self.HEIGHT * 0.08)
-        x_pos = (self.WIDTH - button_width) // 2
-
-        # Draw button rectangle
-        pygame.draw.rect(self.screen, BUTTON_COLOR, (x_pos, y_pos, button_width, button_height))
-
-        # Draw button text
-        button_font = get_font(int(button_height * 0.5))
-        text_surface = button_font.render(label, True, WHITE)
-        text_x = x_pos + (button_width - text_surface.get_width()) // 2
-        text_y = y_pos + (button_height - text_surface.get_height()) // 2
-        self.screen.blit(text_surface, (text_x, text_y))
 
     # placeholder for rendering the save slots screen
     def draw_save_slots(self):
         pass
 
+
+    def handle_popup_click(self):
+        """Toggles the visibility of the pop-up menu."""
+        self.show_popup = not self.show_popup  # Toggle the pop-up menu
+
+        
     # renders the settings screen
     def draw_settings_popup(self):
         # Draw settings background
@@ -316,18 +370,9 @@ class UIManager:
         if self.show_main_menu:
             self.draw_main_menu()
         elif self.show_saves_menu:
-            self.draw_save_slots()
+            self.draw_save_slots()  
         elif self.show_settings_popup:
             self.draw_settings_popup()
-
-    def handle_events(self):
-        for event in pygame.event.get():
-            ...
-            # Handle mouse wheel scrolling
-            if event.type == pygame.MOUSEWHEEL:
-                self.scroll_offset -= event.y * self.scroll_speed
-                self.scroll_offset = max(0, min(self.scroll_offset, self.max_scroll_offset))
-            ...
 
     def start_new_game(self):
         # Reset cookie count and upgrades
@@ -405,10 +450,14 @@ class Game:
                         self.ui_manager.handle_cookie_click()
                         self.ui_manager.draw_text(f"+{self.ui_manager.cookie_per_click:.3f}", self.ui_manager.font, BLACK, int(mouse_pos[0]-26), int(mouse_pos[1]-30))
                     
+                    # Moved functionality into the popup menu 
                     # Check if save button is clicked - IMPORTANT make this a function 
-                    if self.ui_manager.save_button.is_clicked(mouse_pos):
-                        self.ui_manager.handle_save_click()
-                        save(self.ui_manager)  # Call save function
+                    #if self.ui_manager.save_button.is_clicked(mouse_pos):
+                    #    self.ui_manager.handle_save_click()
+                    #    save(self.ui_manager)  # Call save function
+                    
+                    if self.ui_manager.popup_button.is_clicked(mouse_pos):
+                        self.ui_manager.handle_popup_click()
 
                     self.ui_manager.handle_shop_click(mouse_pos)
 
@@ -428,35 +477,34 @@ class Game:
     def run(self):
         while True:
             self.ui_manager.screen.fill(WHITE)
+            
+            # Run the main game loop if the menu is not active
             if self.ui_manager.show_main_menu:
-                # Run main menu if the flag is set
                 self.ui_manager.run_main_menu()
             else:
-                # Run the main game loop if the menu is not active
+                # Update cookies per second and game state as usual
                 current_time = time.time()
-                # updates the user's cookie balance based on their shop purchases
                 if current_time - self.last_time >= 1:
                     self.ui_manager.cookie_count += self.ui_manager.cookies_per_second()
                     self.last_time = current_time
 
-                # renders the various sections of the screen
+                # Render the game elements
                 self.cookie.draw(self.ui_manager.screen)
-                self.ui_manager.cookies_per_click()
                 self.ui_manager.draw_stats(self.ui_manager.screen)
                 self.ui_manager.draw_upgrades(self.ui_manager.screen)
                 self.ui_manager.draw_shop(self.ui_manager.screen)
                 self.ui_manager.draw_partitions(self.ui_manager.screen)
                 self.cookie.update_rotation()
 
+                # Draw the pop-up menu if it's visible
+                self.ui_manager.draw_popup_menu(self.ui_manager.screen)
+
                 # Draw the save button
-                self.ui_manager.save_button.draw(self.ui_manager.screen)
+                # self.ui_manager.save_button.draw(self.ui_manager.screen)
 
             # Handle events and update display
             self.handle_events()
-            # Handle cursor sprite movement
             self.cursor.update()
             self.cursor.draw()
-            pygame.display.flip() # updates the screen in Pygame
-            self.clock.tick(30) # limits the game to 30 ticks per second
-
-
+            pygame.display.flip()  # Update the screen in Pygame
+            self.clock.tick(30)  # Limit the game to 30 ticks per second

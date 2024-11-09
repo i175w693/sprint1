@@ -1,15 +1,15 @@
-1731121305.206461
-15646.0
-53.0
-9.86787225986133
-"Extra Hands":21
-"Cursor":1
-"Grandma":1
-"Farm":1
-"Factory":1
-"Click Multiplier 1":2
-"Click Multiplier 2":1
-"Click Multiplier 3":7
-"Increase Click 1":1
-"Increase Click 2":2
-"Increase Click 3":1
+1731182718.185825
+0.0
+1
+1.0
+"Extra Hands":0
+"Cursor":0
+"Grandma":0
+"Farm":0
+"Factory":0
+"Click Multiplier 1":0
+"Click Multiplier 2":0
+"Click Multiplier 3":0
+"Increase Click 1":0
+"Increase Click 2":0
+"Increase Click 3":0
