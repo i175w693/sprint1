@@ -339,6 +339,11 @@ class UIManager:
             item.purchased_count = 0
             item.cost = item.base_cost  # Reset to the initial base price
 
+        # Reset each shop upgrade's purchase count and price
+        for upgrade in self.shop_upgrades.values():
+            upgrade.purchased_count = 0
+            upgrade.cost = upgrade.base_cost  # Reset to the original price
+
         # Reset cookies per click and multiplier
         self.base_cookie_per_click = 1
         self.click_multiplier = 1.0
