@@ -4,7 +4,7 @@
 
 - [ ] In-game Menu
 - [X] Offline Production
-- [ ] Change shop prices to dynamic pricing
+- [X] Change shop prices to dynamic pricing
   - [ ] Upgrades: Auto Clicker
     - [X] Upgrade 1
     - [X] Upgrade 2
