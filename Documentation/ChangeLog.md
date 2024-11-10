@@ -1,5 +1,11 @@
 # Change Log
 
+## November 10 (Sprint 2)
+
+### Added 
+
+- Added remaining sprites for upgrades **(Jack)**
+
 ## November 8 (Sprint 2)
 
 ### Added
