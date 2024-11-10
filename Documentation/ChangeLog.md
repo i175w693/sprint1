@@ -6,6 +6,17 @@
 
 - Added remaining sprites for upgrades **(Jack)**
 
+## November 10 (Sprint 2)
+
+- Added popup menu **(Mikey)**
+- Added ability to toggle sound in popup menu **(Mikey)**
+
+### Modified
+
+- Moved save game to popup menu **(Mikey)**
+- changed font size and cleaned up UI element appearing where they should not **(Mikey)**
+- Adjusted upgrades to make them more reasonable **(Mikey)**
+
 ## November 8 (Sprint 2)
 
 ### Added
@@ -56,6 +67,7 @@
 
 ### Added
 
+- Added sounds **(Mikey)**
 - Sprint 2 documentation
 
 ## October 27 (Sprint 1)
