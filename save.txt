@@ -1,9 +1,9 @@
-1731182718.185825
-0.0
+1731265039.261238
+15.5
 1
 1.0
 "Extra Hands":0
-"Cursor":0
+"Cursor":1
 "Grandma":0
 "Farm":0
 "Factory":0
