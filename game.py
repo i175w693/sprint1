@@ -105,7 +105,7 @@ class UIManager:
     def create_buttons(self):
         buttons = []
         all_shop_items = {**shop_items, **shop_upgrades}
-        button_height = int(self.HEIGHT * 0.05)
+        button_height = int(self.HEIGHT * 0.07)
         button_margin = int(self.HEIGHT * 0.01)  # Add a margin between buttons
         total_height = len(all_shop_items) * (button_height + button_margin)
         self.max_scroll_offset = max(0, total_height - int(self.HEIGHT * 0.8))  # Calculate max scroll offset
