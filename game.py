@@ -6,7 +6,7 @@ Output: None
 Additional code sources: 
 Developers: Ian Wilson, Andrew Uriell, Peter Pham, Michael Oliver, Jack Youngquist
 Date: 10/24/2024
-Last Modified: 10/27/2024
+Last Modified: 11/10/2024
 '''
 
 import pygame
@@ -116,7 +116,8 @@ class UIManager:
             button = LargeButton(self.screen, 
                                  self.WIDTH - int(self.WIDTH * 0.25), 
                                  button_y, 
-                                 v.name, button_width, button_height)
+                                 v.name, button_width, button_height,
+                                 v.image)
             buttons.append((button, v))
         return buttons
 
@@ -170,10 +171,10 @@ class UIManager:
 
     # renders the user's balance on the top left of the screen
     def draw_stats(self, screen):
-        self.draw_text(f"Cookies: {self.cookie_count:.3f}", self.font, BLACK, int(self.WIDTH * 0.01), int(self.HEIGHT * 0.01))
-        self.draw_text(f"{self.cookie_per_click:.3f} cookies per click", self.font, BLACK, int(self.WIDTH * 0.01), int(self.HEIGHT * 0.05))
+        self.draw_text(f"Cookies: {self.cookie_count:.1f}", self.font, BLACK, int(self.WIDTH * 0.01), int(self.HEIGHT * 0.01))
+        self.draw_text(f"{self.cookies_per_second():.1f} cookies per second", self.font, BLACK, int(self.WIDTH * 0.01), int(self.HEIGHT * 0.05))
 
-    # renders the purchased item's to the middle column (will be replaced with sprites in the future).
+    # renders the purchased item's to the middle column.
     def draw_upgrades(self, screen):
         font_size = int(self.WIDTH * 0.03)  # Dynamic font size based on width
         font = get_font(font_size)
@@ -448,7 +449,7 @@ class Game:
                     # Handle game-related clicks
                     if self.cookie.rect.collidepoint(mouse_pos):
                         self.ui_manager.handle_cookie_click()
-                        self.ui_manager.draw_text(f"+{self.ui_manager.cookie_per_click:.3f}", self.ui_manager.font, BLACK, int(mouse_pos[0]-26), int(mouse_pos[1]-30))
+                        self.ui_manager.draw_text(f"+{self.ui_manager.cookie_per_click:.1f}", self.ui_manager.font, BLACK, int(mouse_pos[0]-26), int(mouse_pos[1]-30))
                     
                     # Moved functionality into the popup menu 
                     # Check if save button is clicked - IMPORTANT make this a function 

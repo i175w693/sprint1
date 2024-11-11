@@ -2,9 +2,19 @@
 
 ## November 10 (Sprint 2)
 
-### Added 
+### Added
 
 - Added remaining sprites for upgrades **(Jack)**
+- Implemented icons for upgrades **(Peter)**
+- 
+
+### Removed
+
+- Rectangle around clicking cookie **(Peter)**
+
+### Modified
+
+- Changed top left counter to be cookies per second instead of cookies per click (CPC is shown by just clicking the cookie) **(Peter)**
 
 ## November 10 (Sprint 2)
 

@@ -28,7 +28,7 @@ class Cookie:
         rotated_image = pygame.transform.rotate(self.image, self.angle)
         new_rect = rotated_image.get_rect(center=self.rect.center)  # Center at original position
         screen.blit(rotated_image, new_rect.topleft)
-        pygame.draw.rect(screen, BLACK, self.rect, 2)  # Draw rectangle around the cookie
+        # pygame.draw.rect(screen, BLACK, self.rect, 2)  # Draw rectangle around the cookie
 
     # updates the angle of rotation for the cookie
     def update_rotation(self):
