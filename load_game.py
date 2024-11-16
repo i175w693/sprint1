@@ -29,27 +29,33 @@ def load(ui_manager):
                     item_name = item[0].strip('"')
                     purchased_count = int(item[1].strip())
                     
-                     # Determine if the item is in shop_items or shop_upgrades
                     if item_name in ui_manager.shop_items:
                         shop_item = ui_manager.shop_items[item_name]
                         shop_item.purchased_count = purchased_count
                         if purchased_count > 0:
                             ui_manager.upgrades_acquired.append(shop_item)
-
                     elif item_name in ui_manager.shop_upgrades:
                         shop_upgrade = ui_manager.shop_upgrades[item_name]
                         shop_upgrade.purchased_count = purchased_count
                         if purchased_count > 0:
                             ui_manager.upgrades_acquired.append(shop_upgrade)
 
+            # Calculate bonus cookies
             bonus_cookies = time_diff / 100
             ui_manager.cookie_count += round(bonus_cookies * ui_manager.cookies_per_second())
-            ui_manager.cookie_per_click =  ui_manager.base_cookie_per_click * ui_manager.click_multiplier
+            ui_manager.cookie_per_click = ui_manager.base_cookie_per_click * ui_manager.click_multiplier
+            
+            # Trigger popup with bonus cookies
+            ui_manager.show_popup_cookie_earned = True
+            ui_manager.bonus_cookies = bonus_cookies
             return True
-    # if not save file exists, return and start a new game
     except FileNotFoundError:
-        print(f'Save file not found!')
+        print('Save file not found! Starting a new game.')
         return None
+    except (ValueError, IndexError) as e:
+        print(f"Error loading save file: {e}")
+        return False
+
     
 
                 # if current_time - self.last_time >= 1:
