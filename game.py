@@ -70,6 +70,8 @@ class UIManager:
         self.max_scroll_offset = 0  # Initialize max scroll offset
         self.scroll_speed = 20  # Initialize scroll speed
         self.show_popup = False
+        self.bonus_cookies = 0
+        self.show_popup_cookie_earned = False
 
     """Check if a specific button was clicked based on label and mouse position."""
     def button_clicked(self, label, mouse_pos):
@@ -198,6 +200,61 @@ class UIManager:
                     self.draw_text(f"{upgrade.name} (CPS: {upgrade.cps}): {upgrade.purchased_count}", font, BLACK, int(self.WIDTH * 0.4), int(self.HEIGHT * 0.15) + idx * int(self.HEIGHT * 0.05))
                 else:
                     self.draw_text(f"{upgrade.name} (CPC: {upgrade.cpc}): {upgrade.purchased_count}", font, BLACK, int(self.WIDTH * 0.4), int(self.HEIGHT * 0.15) + idx * int(self.HEIGHT * 0.05))
+
+    def draw_popup_cookie_earned(self, screen):
+        if self.show_popup_cookie_earned:
+            popup_width = int(self.WIDTH * 0.7)
+            popup_height = int(self.HEIGHT * 0.3)
+            popup_x = (self.WIDTH - popup_width) // 2
+            popup_y = (self.HEIGHT - popup_height) // 2  # Center the popup vertically and horizontally
+
+            # Draw the popup background
+            pygame.draw.rect(screen, GRAY, (popup_x, popup_y, popup_width, popup_height))
+            pygame.draw.rect(screen, BLACK, (popup_x, popup_y, popup_width, popup_height), 3)  # Border
+
+            # Draw the title of the popup
+            title_font = get_font(int(popup_height * 0.1))
+            title_text = "Welcome Back!"
+            self.draw_text(
+                title_text, 
+                title_font, 
+                BLACK, 
+                popup_x + popup_width // 2 - title_font.size(title_text)[0] // 2, 
+                popup_y + 10
+            )
+
+            # Display bonus cookies earned
+            message_font = get_font(int(popup_height * 0.08))
+            message_text = f"You've earned {self.bonus_cookies:.1f} cookies while you were away!"
+            self.draw_text(
+                message_text, 
+                message_font, 
+                BLACK, 
+                popup_x + popup_width // 2 - message_font.size(message_text)[0] // 2, 
+                popup_y + popup_height // 2 - message_font.size(message_text)[1] // 2
+            )
+
+            # Define and draw the "Close" button
+            button_width = int(popup_width * 0.2)
+            button_height = int(popup_height * 0.15)
+            button_x = popup_x + popup_width // 2 - button_width // 2
+            button_y = popup_y + popup_height - button_height - 10
+            close_button = LargeButton(screen, button_x, button_y, "Close", button_width, button_height)
+            close_button.draw(screen)
+
+            # Handle button click
+            mouse_pos = pygame.mouse.get_pos()
+            mouse_pressed = pygame.mouse.get_pressed()[0]
+
+            if close_button.is_clicked(mouse_pos) and mouse_pressed:
+                if not hasattr(self, '_button_clicked') or not self._button_clicked:
+                    self._button_clicked = True
+                    self.show_popup_cookie_earned = False  # Close the popup
+
+            if not mouse_pressed and hasattr(self, '_button_clicked'):
+                self._button_clicked = False  # Reset the click lock
+
+
 
     # Modify this method to handle button clicks properly in the popup menu
     def draw_popup_menu(self, screen):
@@ -499,6 +556,8 @@ class Game:
 
                 # Draw the pop-up menu if it's visible
                 self.ui_manager.draw_popup_menu(self.ui_manager.screen)
+
+                self.ui_manager.draw_popup_cookie_earned(self.ui_manager.screen)
 
                 # Draw the save button
                 # self.ui_manager.save_button.draw(self.ui_manager.screen)
