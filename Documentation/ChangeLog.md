@@ -5,6 +5,7 @@
 ### Added
 
 - Sprint 3 Documentation **(Peter)**
+- Added Background to Main menu and in game **(Jack)**
 
 ## November 10 (Sprint 2)
 
@@ -12,7 +13,6 @@
 
 - Added remaining sprites for upgrades **(Jack)**
 - Implemented icons for upgrades **(Peter)**
-- 
 
 ### Removed
 

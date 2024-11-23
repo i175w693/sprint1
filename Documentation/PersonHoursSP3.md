@@ -5,6 +5,7 @@
 ### Jack Youngquist
 
 - .25 (11/19)
+- 3 (11/22)
 
 ### Peter Pham
 
