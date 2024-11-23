@@ -12,6 +12,7 @@ Last Modified: 11/10/2024
 import pygame
 import sys
 import time
+import math #functions handle floating points up to 10e308, if larger number precision is needed switch to gmpy2
 
 # imports necessary functions and classes from the other python files
 from shop import shop_items, shop_upgrades
@@ -170,11 +171,67 @@ class UIManager:
     # returns the amount of cookies the user should be earning per second based on the purchased items
     def cookies_per_second(self):
         return sum(item.cps * item.purchased_count for item in self.shop_items.values() if item.cps != None)
+    
+    # generates Latin suffix from number given by simplify number
+    def get_suffix(self, illion):
+        """
+        Dynamically generates the suffix for a given index, using a Latin prefix lists.
+        Includes short forms for Million, Billion, etc., as part of the prefixes, Latin prefixes for tens and units in the tens.
+        """
+
+        first_latin_units = [
+            "m", "b", "tr", "quadr", "quint", "sext", "sept", 
+            "oct", "non"
+        ]
+        n_latin_units = [
+            "un", "duo", "tre", "quattuor", "quin", "se", "septen", 
+            "octo", "novem"
+        ]
+        latin_tens = [
+            "dec", "vigint", "trigint", "quadragint", "quinquagint", 
+            "sexagint", "septuagint", "octogint", "nonagint"
+        ]
+        if illion < 10:
+            return f"{first_latin_units[illion-1]}illion"
+        elif illion < 100:
+            digit_list = [int(digit) for digit in str(illion)]
+            if illion % 10 == 0:
+                return f"{latin_tens[digit_list[0]-1]}illion"
+            else:
+                return f"{n_latin_units[digit_list[1]-1]}{latin_tens[digit_list[0]-1]}illion"
+        elif illion == 100:
+            return "centillion"
+        #largest suffix pygame can generate up to
+        elif illion == 101:
+            return "uncentillion"
+    
+    #Uses get_suffix to round and generate latin names for large numbers
+    def simplify_number(self, num):
+        if num < 1_000_000: # no need for latin suffix if less than 1 million
+            return f"{num:.1f}"
+
+        # Get the base-10 exponent using math.log10
+        exponent = math.log10(num)
+        
+        #try block for if the number reaches beyond pygames range
+        try:
+            # Calculate the index for suffix (group every 3 powers of 10)
+            suffix_index = int(exponent // 3) - 1  # Subtract 1 for searching through array (0-9)
+        except:
+            return "Infinity"
+        # Adjust number to the corresponding magnitude
+        scaled_num = num / (10 ** ((suffix_index + 1) * 3))  # Adjust for skipped indices
+
+        # Dynamically generate suffix
+        suffix = self.get_suffix(suffix_index)
+
+        return f"{scaled_num:.3f} {suffix.capitalize()}" #return the number rounded to 3 decimal places with latin suffix following
+
 
     # renders the user's balance on the top left of the screen
     def draw_stats(self, screen):
-        self.draw_text(f"Cookies: {self.cookie_count:.1f}", self.font, BLACK, int(self.WIDTH * 0.01), int(self.HEIGHT * 0.01))
-        self.draw_text(f"{self.cookies_per_second():.1f} cookies per second", self.font, BLACK, int(self.WIDTH * 0.01), int(self.HEIGHT * 0.05))
+        self.draw_text(f"Cookies: {self.simplify_number(self.cookie_count)}", self.font, BLACK, int(self.WIDTH * 0.01), int(self.HEIGHT * 0.01))
+        self.draw_text(f"{self.simplify_number(self.cookies_per_second())} cookies per second", self.font, BLACK, int(self.WIDTH * 0.01), int(self.HEIGHT * 0.05))
 
     # renders the purchased item's to the middle column.
     def draw_upgrades(self, screen):
@@ -225,7 +282,7 @@ class UIManager:
 
             # Display bonus cookies earned
             message_font = get_font(int(popup_height * 0.08))
-            message_text = f"You've earned {self.bonus_cookies:.1f} cookies while you were away!"
+            message_text = f"You've earned {self.simplify_number(self.bonus_cookies)} cookies while you were away!"
             self.draw_text(
                 message_text, 
                 message_font, 
@@ -509,7 +566,7 @@ class Game:
                     # Handle game-related clicks
                     if self.cookie.rect.collidepoint(mouse_pos):
                         self.ui_manager.handle_cookie_click()
-                        self.ui_manager.draw_text(f"+{self.ui_manager.cookie_per_click:.1f}", self.ui_manager.font, BLACK, int(mouse_pos[0]-26), int(mouse_pos[1]-30))
+                        self.ui_manager.draw_text(f"+{self.ui_manager.simplify_number(self.ui_manager.cookie_per_click)}", self.ui_manager.font, BLACK, int(mouse_pos[0]-26), int(mouse_pos[1]-30))
                     
                     # Moved functionality into the popup menu 
                     # Check if save button is clicked - IMPORTANT make this a function 
