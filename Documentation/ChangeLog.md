@@ -1,5 +1,11 @@
 # Change Log
 
+## November 22 (Sprint 3)
+
+### Added
+
+- Sprint 3 Documentation **(Peter)**
+
 ## November 10 (Sprint 2)
 
 ### Added
