@@ -346,8 +346,8 @@ class UIManager:
     # renders the main menu screen when the user starts the game
     def draw_main_menu(self):
         # Draw the title
-        title_font = get_font(int(self.HEIGHT * 0.1))
-        self.draw_text("KU Cookie Clicker", title_font, BLACK, self.WIDTH // 2 - title_font.size("KU Cookie Clicker")[0] // 2, int(self.HEIGHT * 0.1))
+        #title_font = get_font(int(self.HEIGHT * 0.1))
+        #self.draw_text("KU Cookie Clicker", title_font, BLACK, self.WIDTH // 2 - title_font.size("KU Cookie Clicker")[0] // 2, int(self.HEIGHT * 0.1))
 
         # Draw menu buttons
         for button in self.main_menu_buttons:
@@ -464,7 +464,10 @@ class Game:
         self.last_time = time.time()
         self.clock = pygame.time.Clock()
         self.cursor = Cursor(f"{ASSETS_FILEPATH}/cursor/cursor1.png", 1, 64, 64)
-
+        self.background_image = pygame.image.load(f"{ASSETS_FILEPATH}/background/background.png") #background image
+        self.background_image = pygame.transform.scale(self.background_image, (self.ui_manager.WIDTH, self.ui_manager.HEIGHT))#scale background image
+        self.ig_background_image = pygame.image.load(f"{ASSETS_FILEPATH}/background/in_game_background.png") #in game background
+        self.ig_background_image = pygame.transform.scale(self.ig_background_image, (self.ui_manager.WIDTH, self.ui_manager.HEIGHT))#scale in game background image
     # checks each event that occurs in pygame and updates the game accordingly.
     def handle_events(self):
         for event in pygame.event.get():
@@ -533,11 +536,11 @@ class Game:
 
     # Begins the game and runs in a continuous loop
     def run(self):
-        while True:
-            self.ui_manager.screen.fill(WHITE)
+        while True:            
             
             # Run the main game loop if the menu is not active
             if self.ui_manager.show_main_menu:
+                self.ui_manager.screen.blit(self.background_image, (0,0))#draw background for menu
                 self.ui_manager.run_main_menu()
             else:
                 # Update cookies per second and game state as usual
@@ -547,6 +550,7 @@ class Game:
                     self.last_time = current_time
 
                 # Render the game elements
+                self.ui_manager.screen.blit(self.ig_background_image, (0,0)) #draw in game background
                 self.cookie.draw(self.ui_manager.screen)
                 self.ui_manager.draw_stats(self.ui_manager.screen)
                 self.ui_manager.draw_upgrades(self.ui_manager.screen)

@@ -1,12 +1,17 @@
 # Change Log
 
+## November 22 (Sprint 3)
+
+### Added
+
+- Added Background to Main menu and in game **(Jack)** 
+
 ## November 10 (Sprint 2)
 
 ### Added
 
 - Added remaining sprites for upgrades **(Jack)**
 - Implemented icons for upgrades **(Peter)**
-- 
 
 ### Removed
 
