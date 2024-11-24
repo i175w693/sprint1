@@ -6,7 +6,7 @@
 - [X] Random Events
 - [X] Offline Notifications
 - [ ] Cookie Analytics
-- [ ]Upgrades
+- [X] Upgrades
   - [X] Upgrades: Auto Clicker
     - [X] Upgrade 1
     - [X] Upgrade 2
@@ -21,4 +21,4 @@
     - [X] Upgrade 3
 - [ ] UI improvements
 - [X] Balancing Changes
-- [ ] Documentation
+- [X] Documentation

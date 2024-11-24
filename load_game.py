@@ -18,6 +18,7 @@ def load(ui_manager):
             for number, line in enumerate(file):
                 if number == 0:
                     time_diff = time.time() - float(line.strip())
+                    ui_manager.last_played_timestamp = line.strip()
                 elif number == 1:
                     ui_manager.cookie_count = float(line.strip())
                 elif number == 2:
@@ -41,7 +42,7 @@ def load(ui_manager):
                             ui_manager.upgrades_acquired.append(shop_upgrade)
 
             # Calculate bonus cookies
-            bonus_cookies = time_diff / 100
+            bonus_cookies = time_diff / 60
             ui_manager.cookie_count += round(bonus_cookies * ui_manager.cookies_per_second())
             ui_manager.cookie_per_click = ui_manager.base_cookie_per_click * ui_manager.click_multiplier
             

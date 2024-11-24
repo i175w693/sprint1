@@ -14,6 +14,7 @@ import sys
 import time
 import math #functions handle floating points up to 10e308, if larger number precision is needed switch to gmpy2
 import random
+from datetime import datetime
 
 # imports necessary functions and classes from the other python files
 from shop import ShopUpgrade, shop_items, shop_upgrades
@@ -79,6 +80,7 @@ class UIManager:
         self.notification_start_time = None
         self.active_event_popup = None
         self.event_popup_end_time = None
+        self.last_played_timestamp = None
 
 
     """Check if a specific button was clicked based on label and mouse position."""
@@ -321,13 +323,24 @@ class UIManager:
 
             # Display bonus cookies earned
             message_font = get_font(int(popup_height * 0.08))
-            message_text = f"You've earned {self.simplify_number(self.bonus_cookies)} cookies while you were away!"
+            message_text = f"You've earned {self.simplify_number(self.bonus_cookies)} cookies while you were away ({self.cookies_per_second()} cookies per offline hour)!"
             self.draw_text(
                 message_text, 
                 message_font, 
                 BLACK, 
                 popup_x + popup_width // 2 - message_font.size(message_text)[0] // 2, 
                 popup_y + popup_height // 2 - message_font.size(message_text)[1] // 2
+            )
+
+            # Display bonus cookies earned
+            message_font = get_font(int(popup_height * 0.08))
+            message_text = f"Time Last Played: {datetime.fromtimestamp(float(self.last_played_timestamp)).strftime('%Y-%m-%d %H:%M:%S CST')}"
+            self.draw_text(
+                message_text, 
+                message_font, 
+                BLACK, 
+                popup_x + popup_width // 2 - message_font.size(message_text)[0] // 2, 
+                popup_y + popup_height // 2 - message_font.size(message_text)[1] // 2 + 25
             )
 
             # Define and draw the "Close" button
