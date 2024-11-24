@@ -9,6 +9,7 @@
 - Added dates to the offline notification screen **(Peter)**
 - Cookie Analytics **(Peter)**
 - Item cost to shop display **(Peter)**
+- Sprint 4 documentation **(Peter)**
 
 ## November 23 (Sprint 3)
 
