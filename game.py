@@ -13,6 +13,7 @@ import pygame
 import sys
 import time
 import math #functions handle floating points up to 10e308, if larger number precision is needed switch to gmpy2
+import random
 
 # imports necessary functions and classes from the other python files
 from shop import shop_items, shop_upgrades
@@ -73,6 +74,9 @@ class UIManager:
         self.show_popup = False
         self.bonus_cookies = 0
         self.show_popup_cookie_earned = False
+        self.achievement_manager = AchievementManager()  # Initialize AchievementManager
+        self.notification_duration = 3  # Duration to display each notification in seconds
+        self.notification_start_time = None
 
     """Check if a specific button was clicked based on label and mouse position."""
     def button_clicked(self, label, mouse_pos):
@@ -376,7 +380,20 @@ class UIManager:
                     if hasattr(self, '_button_clicked') and self._button_clicked:
                         self._button_clicked = False  # Unlock the button when the button is released
 
+            # Draw achievements
+            self.draw_achievements(screen, popup_x, popup_y + int(popup_height * 0.2), popup_width)
 
+    def draw_achievements(self, screen, x, y, width):
+        font_size = int(self.WIDTH * 0.02)  # Dynamic font size based on width
+        font = get_font(font_size)
+        self.draw_text("Achievements:", font, BLACK, x + 10, y)
+
+        # Access the current state of achievements
+        for idx, (name, data) in enumerate(self.achievement_manager.achievements.items()):
+            status = "Unlocked" if data["achieved"] else "Locked"
+            # print(f"Drawing {name}: {status}")  # Debug print
+            achievement_text = f"{name}: {status}"
+            self.draw_text(achievement_text, font, BLACK, x + 10, y + (idx + 1) * int(self.HEIGHT * 0.05))
 
     # draws the shop section of the screen
     def draw_shop(self, screen):
@@ -512,11 +529,83 @@ class UIManager:
         # Reset any other game-related state, such as showing main menu or other flags
         self.show_main_menu = False
 
+    def draw_notifications(self, screen):
+        if self.achievement_manager.notifications:
+            if self.notification_start_time is None:
+                self.notification_start_time = time.time()
+
+            current_time = time.time()
+            if current_time - self.notification_start_time < self.notification_duration:
+                notification = self.achievement_manager.notifications[0]
+                font_size = int(self.WIDTH * 0.03)
+                font = get_font(font_size)
+                text_surface = font.render(notification, True, BLACK)
+                text_rect = text_surface.get_rect(center=(self.WIDTH // 2, self.HEIGHT * 0.1))
+                pygame.draw.rect(screen, GRAY, text_rect.inflate(20, 20))  # Background for the notification
+                screen.blit(text_surface, text_rect)
+            else:
+                self.achievement_manager.notifications.pop(0)
+                self.notification_start_time = None
+
+class AchievementManager:
+    def __init__(self):
+        self.achievements = {
+            "First Click": {"description": "Make your first click", "achieved": False},
+            "100 Cookies": {"description": "Collect 100 cookies", "achieved": False},
+            # Add more achievements as needed
+        }
+        self.notifications = []  # List to store active notifications
+
+    def check_achievements(self, cookie_count):
+        if cookie_count >= 1 and not self.achievements["First Click"]["achieved"]:
+            self.achievements["First Click"]["achieved"] = True
+            self.notifications.append("Achievement Unlocked: First Click!")
+            print("First Click achievement unlocked!")  # Debug print
+        if cookie_count >= 10 and not self.achievements["100 Cookies"]["achieved"]:
+            self.achievements["100 Cookies"]["achieved"] = True
+            self.notifications.append("Achievement Unlocked: 100 Cookies!")
+            print("100 Cookies achievement unlocked!")  # Debug print
+        # Add more checks as needed
+
+    def get_notifications(self):
+        return self.notifications
+
+    def clear_notifications(self):
+        self.notifications.clear()
+
+class RandomEventManager:
+    def __init__(self):
+        self.events = ["Golden Cookie", "Cookie Storm", "Cookie Thief"]
+
+    def trigger_event(self):
+        event = random.choice(self.events)
+        if event == "Golden Cookie":
+            print("Golden Cookie appeared! Click it for a bonus!")
+        elif event == "Cookie Storm":
+            print("Cookie Storm! Double cookies for 10 seconds!")
+        elif event == "Cookie Thief":
+            print("Cookie Thief! Lose 10% of your cookies!")
+        # Implement event effects
+
+class CookieAnalytics:
+    def __init__(self):
+        self.total_cookies = 0
+        self.clicks = 0
+
+    def update(self, cookies_gained, clicks):
+        self.total_cookies += cookies_gained
+        self.clicks += clicks
+
+    def display_stats(self):
+        print(f"Total Cookies: {self.total_cookies}")
+        print(f"Total Clicks: {self.clicks}")
+
 # Main game class
 class Game:
     # initializes the UI and time keeping functions
     def __init__(self):
         self.ui_manager = UIManager()
+        self.achievement_manager = self.ui_manager.achievement_manager  # Ensure both use the same instance
         self.cookie = Cookie(f"{ASSETS_FILEPATH}/cookie.png", 0.2, self.ui_manager.WIDTH, self.ui_manager.HEIGHT)
         self.last_time = time.time()
         self.clock = pygame.time.Clock()
@@ -525,6 +614,7 @@ class Game:
         self.background_image = pygame.transform.scale(self.background_image, (self.ui_manager.WIDTH, self.ui_manager.HEIGHT))#scale background image
         self.ig_background_image = pygame.image.load(f"{ASSETS_FILEPATH}/background/in_game_background.png") #in game background
         self.ig_background_image = pygame.transform.scale(self.ig_background_image, (self.ui_manager.WIDTH, self.ui_manager.HEIGHT))#scale in game background image
+
     # checks each event that occurs in pygame and updates the game accordingly.
     def handle_events(self):
         for event in pygame.event.get():
@@ -566,6 +656,7 @@ class Game:
                     # Handle game-related clicks
                     if self.cookie.rect.collidepoint(mouse_pos):
                         self.ui_manager.handle_cookie_click()
+                        self.achievement_manager.check_achievements(self.ui_manager.cookie_count)
                         self.ui_manager.draw_text(f"+{self.ui_manager.simplify_number(self.ui_manager.cookie_per_click)}", self.ui_manager.font, BLACK, int(mouse_pos[0]-26), int(mouse_pos[1]-30))
                     
                     # Moved functionality into the popup menu 
@@ -622,6 +713,8 @@ class Game:
 
                 # Draw the save button
                 # self.ui_manager.save_button.draw(self.ui_manager.screen)
+
+                self.ui_manager.draw_notifications(self.ui_manager.screen)
 
             # Handle events and update display
             self.handle_events()

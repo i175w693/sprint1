@@ -1,5 +1,12 @@
 # Change Log
 
+## November 23 (Sprint 3)
+
+### Added
+
+- Achievements **(Andrew)**
+- Pop-up for when achievements are completed **(Andrew)**
+
 ## November 22 (Sprint 3)
 
 ### Added
