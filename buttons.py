@@ -31,6 +31,7 @@ class Button:
         if self.image_file is not None:
             IMAGE = pygame.transform.scale(pygame.image.load(self.image_file).convert_alpha(), (self.rect.width, self.rect.height))
             screen.blit(IMAGE, self.rect)
+            self.draw_text(self.text, self.font, WHITE, self.rect.x + 10, self.rect.y + 5, screen)
         else:
             pygame.draw.rect(screen, BUTTON_COLOR, self.rect)
             self.draw_text(self.text, self.font, WHITE, self.rect.x + 10, self.rect.y + 5, screen)

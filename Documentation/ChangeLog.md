@@ -7,6 +7,8 @@
 - Balancing changes for Click Multiplier and Increase Click **(Andrew)**
 - Dynamic buttons for Click Multiplier and Increase Click **(Andrew)**
 - Added dates to the offline notification screen **(Peter)**
+- Cookie Analytics **(Peter)**
+- Item cost to shop display **(Peter)**
 
 ## November 23 (Sprint 3)
 

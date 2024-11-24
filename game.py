@@ -154,7 +154,7 @@ class UIManager:
 
                 # Handle custom price increment for Click Multipliers and Increase Clicks
                 if item.name.startswith("Click Multiplier") or item.name.startswith("Increase Click"):
-                    current_price = item.cost
+                    current_price = item.base_cost
 
                 # Only proceed if the player has enough cookies
                 if self.cookie_count >= current_price:
@@ -164,34 +164,34 @@ class UIManager:
 
                     # Custom price increment for "Click Multiplier 1"
                     if item.name == "Click Multiplier 1":
-                        item.cost += 1000
+                        item.base_cost += 1000
 
                     # Custom price increment for "Click Multiplier 2"
                     if item.name == "Click Multiplier 2":
-                        item.cost += 2500
+                        item.base_cost += 2500
 
                     # Custom price increment for "Click Multiplier 3"
                     if item.name == "Click Multiplier 3":
-                        item.cost += 5000
+                        item.base_cost += 5000
 
                     # Custom price increment for "Increase Click 1"
                     if item.name == "Increase Click 1":
-                        item.cost += 50
+                        item.base_cost += 50
 
                     # Custom price increment for "Increase Click 2"
                     if item.name == "Increase Click 2":
-                        item.cost += 150
+                        item.base_cost += 150
 
                     # Custom price increment for "Increase Click 3"
                     if item.name == "Increase Click 3":
-                        item.cost += 300
+                        item.base_cost += 300
 
                     # Add the item to upgrades_acquired if not already in the list
                     if item not in self.upgrades_acquired:
                         self.upgrades_acquired.append(item)
 
                     # Update button text with the new calculated price
-                    button.text = f"{item.name} - ${item.cost} cookies"
+                    button.text = f"{current_price} cookies"
 
                     # Apply any effects (CPC or CPS) associated with the item
                     if item.name.startswith("Click Multiplier"):
@@ -429,7 +429,10 @@ class UIManager:
                         self._button_clicked = False  # Unlock the button when the button is released
 
             # Draw achievements
-            self.draw_achievements(screen, popup_x, popup_y + int(popup_height * 0.2), popup_width)
+            self.draw_achievements(screen, popup_x, popup_y + int(popup_height * 0.1), popup_width)
+
+            # Draw analytics
+            self.draw_analytics(screen, popup_x, popup_y + int(popup_height * 0.3), popup_width)
 
     def draw_achievements(self, screen, x, y, width):
         font_size = int(self.WIDTH * 0.02)  # Dynamic font size based on width
@@ -443,6 +446,40 @@ class UIManager:
             achievement_text = f"{name}: {status}"
             self.draw_text(achievement_text, font, BLACK, x + 10, y + (idx + 1) * int(self.HEIGHT * 0.05))
 
+    # draws the save file analytics
+    def draw_analytics(self, screen, x, y, width):
+        font_size = int(self.WIDTH * 0.02)  # Dynamic font size based on width
+        font = get_font(font_size)
+        self.draw_text("Analytics:", font, BLACK, x + 10, y)
+
+        stats = {
+            "Cookies": f'{self.cookie_count:.3f}',
+            "Cookies Per Click": f'{self.cookie_per_click:.3f}',
+            "Cookies Per Second": f'{self.cookies_per_second():.3f}'
+        }
+        purchases = {
+            "Extra Hands": self.shop_items["Extra Hands"].purchased_count,
+            "Cursor": self.shop_items["Cursor"].purchased_count,
+            "Grandma": self.shop_items["Grandma"].purchased_count,
+            "Farm": self.shop_items["Farm"].purchased_count,
+            "Factory": self.shop_items["Factory"].purchased_count,
+            "Click Multiplier 1": self.shop_upgrades["Click Multiplier 1"].purchased_count,
+            "Click Multiplier 2": self.shop_upgrades["Click Multiplier 2"].purchased_count,
+            "Click Multiplier 3": self.shop_upgrades["Click Multiplier 3"].purchased_count,
+            "Increase Click 1": self.shop_upgrades["Increase Click 1"].purchased_count,
+            "Increase Click 2": self.shop_upgrades["Increase Click 2"].purchased_count,
+            "Increase Click 3": self.shop_upgrades["Increase Click 3"].purchased_count
+        }
+        # prints save stats
+        for idx, (name, purchased_count) in enumerate(stats.items()):
+            text = f"{name}: {purchased_count}"
+            self.draw_text(text, font, BLACK, x + 10, y + (idx + 1) * int(self.HEIGHT * 0.05))
+
+        # prints save purchase stats
+        for idx, (name, purchased_count) in enumerate(purchases.items()):
+            text = f"{name}: {purchased_count}"
+            self.draw_text(text, font, BLACK, x + 500, y + (idx + 1) * int(self.HEIGHT * 0.05))
+
     # draws the shop section of the screen
     def draw_shop(self, screen):
         font_size = int(self.WIDTH * 0.03)
@@ -452,9 +489,9 @@ class UIManager:
         # Draw shop items
         for button, item in self.buttons:
             if 0 <= button.y <= self.HEIGHT:  # Only draw buttons within the visible area
-                button.draw(screen)
                 current_price = int(item.base_cost * (1.15 ** item.purchased_count))
-                button.text = f"{item.name} - {current_price} cookies"
+                button.text = f"{current_price} cookies"
+                button.draw(screen)
 
 
 
@@ -491,6 +528,7 @@ class UIManager:
 
         # Draw menu buttons
         for button in self.main_menu_buttons:
+            button.font = get_font(0)
             button.draw(self.screen)
 
 
