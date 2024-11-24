@@ -150,18 +150,46 @@ class UIManager:
                 # Calculate the current price
                 current_price = int(item.base_cost * (1.15 ** item.purchased_count))
 
+                # Handle custom price increment for Click Multipliers and Increase Clicks
+                if item.name.startswith("Click Multiplier") or item.name.startswith("Increase Click"):
+                    current_price = item.cost
+
                 # Only proceed if the player has enough cookies
                 if self.cookie_count >= current_price:
                     # Deduct the cookie count and update purchase state
                     self.cookie_count -= current_price
                     item.purchased_count += 1  # Increment the purchase count
 
+                    # Custom price increment for "Click Multiplier 1"
+                    if item.name == "Click Multiplier 1":
+                        item.cost += 1000
+
+                    # Custom price increment for "Click Multiplier 2"
+                    if item.name == "Click Multiplier 2":
+                        item.cost += 2500
+
+                    # Custom price increment for "Click Multiplier 3"
+                    if item.name == "Click Multiplier 3":
+                        item.cost += 5000
+
+                    # Custom price increment for "Increase Click 1"
+                    if item.name == "Increase Click 1":
+                        item.cost += 50
+
+                    # Custom price increment for "Increase Click 2"
+                    if item.name == "Increase Click 2":
+                        item.cost += 150
+
+                    # Custom price increment for "Increase Click 3"
+                    if item.name == "Increase Click 3":
+                        item.cost += 300
+
                     # Add the item to upgrades_acquired if not already in the list
                     if item not in self.upgrades_acquired:
                         self.upgrades_acquired.append(item)
 
                     # Update button text with the new calculated price
-                    button.text = f"{item.name} - ${int(item.base_cost * (1.15 ** item.purchased_count))} cookies"
+                    button.text = f"{item.name} - ${item.cost} cookies"
 
                     # Apply any effects (CPC or CPS) associated with the item
                     if item.name.startswith("Click Multiplier"):
@@ -177,6 +205,7 @@ class UIManager:
 
                     # Refresh the buttons after purchase to show/hide based on affordability
                     self.buttons = self.create_buttons()
+
 
     # returns the amount of cookies the user should be earning per second based on the purchased items
     def cookies_per_second(self):
