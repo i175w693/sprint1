@@ -1,5 +1,12 @@
 # Change Log
 
+## November 24 (Sprint 3)
+
+### Added
+
+- Balancing changes for Click Multiplier and Increase Click **(Andrew)**
+- Dynamic buttons for Click Multiplier and Increase Click **(Andrew)**
+
 ## November 23 (Sprint 3)
 
 ### Added

@@ -2,7 +2,7 @@
 
 ## TODO
 
-- [ ] Achievements/Challenges
+- [X] Achievements/Challenges
 - [X] Random Events
 - [X] Offline Notifications
 - [ ] Cookie Analytics
@@ -11,14 +11,14 @@
     - [X] Upgrade 1
     - [X] Upgrade 2
     - [X] Upgrade 3
-  - [ ] Upgrades: Click Multipliers
-    - [ ] Upgrade 1
-    - [ ] Upgrade 2
-    - [ ] Upgrade 3
-  - [ ] Upgrades: More Cookies/Click
-    - [ ] Upgrade 1
-    - [ ] Upgrade 2
-    - [ ] Upgrade 3
+  - [X] Upgrades: Click Multipliers
+    - [X] Upgrade 1
+    - [X] Upgrade 2
+    - [X] Upgrade 3
+  - [X] Upgrades: More Cookies/Click
+    - [X] Upgrade 1
+    - [X] Upgrade 2
+    - [X] Upgrade 3
 - [ ] UI improvements
-- [ ] Balancing Changes
+- [X] Balancing Changes
 - [ ] Documentation
