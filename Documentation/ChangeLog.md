@@ -6,7 +6,7 @@
 
 - Achievements **(Andrew)**
 - Pop-up for when achievements are completed **(Andrew)**
-- Added temple upgrade (Auto clicker) **(Ian)**
+- Added Temple upgrade (Auto clicker) **(Ian)**
 - Added Gambling event and popup (Risk all cookies for a 5x increase of cookies) **(Ian)**
 - Added Cookie storm event and popup (2x clicks for 15 seconds) **(Ian)**
 - Added Golden cookie event and popup (10x clicks for 10 seconds) **(Ian)**
