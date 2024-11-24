@@ -2,7 +2,7 @@
 
 ## TODO
 
-- [ ] Achievements/Challenges
+- [X] Achievements/Challenges
 - [X] Random Events
 - [X] Offline Notifications
 - [ ] Cookie Analytics

@@ -16,7 +16,7 @@ import math #functions handle floating points up to 10e308, if larger number pre
 import random
 
 # imports necessary functions and classes from the other python files
-from shop import shop_items, shop_upgrades
+from shop import ShopUpgrade, shop_items, shop_upgrades
 from cookie import Cookie
 from save_game import save
 from load_game import load
@@ -114,28 +114,34 @@ class UIManager:
     # function to render the buttons on the screen for each of the shop's items
     def create_buttons(self):
         buttons = []
-        all_shop_items = {**shop_items, **shop_upgrades}
+        all_shop_items = {**self.shop_items, **self.shop_upgrades}
         button_height = int(self.HEIGHT * 0.07)
         button_margin = int(self.HEIGHT * 0.01)  # Add a margin between buttons
         total_height = len(all_shop_items) * (button_height + button_margin)
         self.max_scroll_offset = max(0, total_height - int(self.HEIGHT * 0.8))  # Calculate max scroll offset
 
         for idx, (k, v) in enumerate(all_shop_items.items()):
+            # Check affordability for upgrades only
+            if isinstance(v, ShopUpgrade) and self.cookie_count < v.cost:
+                continue  # Skip if the upgrade cannot be afforded
+
             button_width = int(self.WIDTH * 0.15)
             button_y = int(self.HEIGHT * 0.15) + idx * (button_height + button_margin) - self.max_scroll_offset
             button = LargeButton(self.screen, 
-                                 self.WIDTH - int(self.WIDTH * 0.25), 
-                                 button_y, 
-                                 v.name, button_width, button_height,
-                                 v.image)
+                                self.WIDTH - int(self.WIDTH * 0.25), 
+                                button_y, 
+                                v.name, button_width, button_height,
+                                v.image)
             buttons.append((button, v))
         return buttons
+
 
     # function to handle to cookies earned per click
     def handle_cookie_click(self):
         self.cookie_count += self.cookie_per_click
         self.sound_manager.play_sound("click")
         # print(f"Cookie clicked! Total cookies: {self.cookie_count}")  # Log message for cookie clicks
+        self.buttons = self.create_buttons()
 
     # function to handle the purchase of upgrades from the shop
     def handle_shop_click(self, mouse_pos):
@@ -146,9 +152,6 @@ class UIManager:
 
                 # Only proceed if the player has enough cookies
                 if self.cookie_count >= current_price:
-                    # Lock the purchase process
-                    self.processing_purchase = True
-                    
                     # Deduct the cookie count and update purchase state
                     self.cookie_count -= current_price
                     item.purchased_count += 1  # Increment the purchase count
@@ -156,7 +159,7 @@ class UIManager:
                     # Add the item to upgrades_acquired if not already in the list
                     if item not in self.upgrades_acquired:
                         self.upgrades_acquired.append(item)
-                    
+
                     # Update button text with the new calculated price
                     button.text = f"{item.name} - ${int(item.base_cost * (1.15 ** item.purchased_count))} cookies"
 
@@ -167,13 +170,13 @@ class UIManager:
                         self.base_cookie_per_click += item.cpc
                     elif item.cpc is not None:
                         self.base_cookie_per_click += item.cpc
-                    
+
                     # Recalculate cookies per click
                     self.cookie_per_click = self.base_cookie_per_click * self.click_multiplier
                     self.sound_manager.play_sound("shop")
 
-                    # Unlock the purchase process
-                    self.processing_purchase = False
+                    # Refresh the buttons after purchase to show/hide based on affordability
+                    self.buttons = self.create_buttons()
 
     # returns the amount of cookies the user should be earning per second based on the purchased items
     def cookies_per_second(self):
@@ -408,12 +411,9 @@ class UIManager:
         for button, item in self.buttons:
             if 0 <= button.y <= self.HEIGHT:  # Only draw buttons within the visible area
                 button.draw(screen)
-            current_price = int(item.base_cost * (1.15 ** item.purchased_count))
-            button.text = f"{item.name} - {current_price} cookies"
-            button.draw(screen)
+                current_price = int(item.base_cost * (1.15 ** item.purchased_count))
+                button.text = f"{item.name} - {current_price} cookies"
 
-        # Draw scroll bar
-        self.draw_scroll_bar(screen)
 
 
     def draw_event_popup(self, screen):
@@ -642,7 +642,7 @@ class AchievementManager:
             self.achievements["First Click"]["achieved"] = True
             self.notifications.append("Achievement Unlocked: First Click!")
             print("First Click achievement unlocked!")  # Debug print
-        if cookie_count >= 10 and not self.achievements["100 Cookies"]["achieved"]:
+        if cookie_count >= 100 and not self.achievements["100 Cookies"]["achieved"]:
             self.achievements["100 Cookies"]["achieved"] = True
             self.notifications.append("Achievement Unlocked: 100 Cookies!")
             print("100 Cookies achievement unlocked!")  # Debug print
