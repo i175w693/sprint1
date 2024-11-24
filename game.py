@@ -77,6 +77,9 @@ class UIManager:
         self.achievement_manager = AchievementManager()  # Initialize AchievementManager
         self.notification_duration = 3  # Duration to display each notification in seconds
         self.notification_start_time = None
+        self.active_event_popup = None
+        self.event_popup_end_time = None
+
 
     """Check if a specific button was clicked based on label and mouse position."""
     def button_clicked(self, label, mouse_pos):
@@ -412,6 +415,27 @@ class UIManager:
         # Draw scroll bar
         self.draw_scroll_bar(screen)
 
+
+    def draw_event_popup(self, screen):
+        if self.active_event_popup and time.time() < self.event_popup_end_time:
+            popup_width = int(self.WIDTH * 0.5)
+            popup_height = int(self.HEIGHT * 0.1)
+            popup_x = (self.WIDTH - popup_width) // 2
+            popup_y = int(self.HEIGHT * 0.1)
+
+            # Draw the popup background
+            pygame.draw.rect(screen, GRAY, (popup_x, popup_y, popup_width, popup_height))
+            pygame.draw.rect(screen, BLACK, (popup_x, popup_y, popup_width, popup_height), 2)  # Border
+
+            # Draw the event text
+            font = get_font(int(self.HEIGHT * 0.05))
+            self.draw_text(self.active_event_popup, font, BLACK, popup_x + 10, popup_y + 10)
+        else:
+            self.active_event_popup = None  # Clear the popup when time expires
+
+
+
+
     # Draws vertical lines to partition the screen
     def draw_partitions(self, screen):
         pygame.draw.line(screen, GRAY, (self.WIDTH * 0.33, 0), (self.WIDTH * 0.33, self.HEIGHT), 2)  # Left partition
@@ -475,6 +499,63 @@ class UIManager:
         checkbox_x = x + int(popup_width * 0.8)
         checkbox_y = y
         pygame.draw.rect(self.screen, BLACK, (checkbox_x, checkbox_y, checkbox_side, checkbox_side))
+
+
+    def draw_gambling_popup(self, screen, random_event_manager):
+        if random_event_manager.show_gambling_popup:
+            popup_width = int(self.WIDTH * 0.7)
+            popup_height = int(self.HEIGHT * 0.3)
+            popup_x = (self.WIDTH - popup_width) // 2
+            popup_y = (self.HEIGHT - popup_height) // 2
+
+            # Draw the popup background
+            pygame.draw.rect(screen, GRAY, (popup_x, popup_y, popup_width, popup_height))
+            pygame.draw.rect(screen, BLACK, (popup_x, popup_y, popup_width, popup_height), 3)  # Border
+
+            # Draw the title of the popup
+            title_font = get_font(int(popup_height * 0.1))
+            title_text = "Gambling Event!"
+            self.draw_text(
+                title_text,
+                title_font,
+                BLACK,
+                popup_x + popup_width // 2 - title_font.size(title_text)[0] // 2,
+                popup_y + 10
+            )
+
+            # Display the options: "Risk It" and "Nah"
+            button_width = int(popup_width * 0.2)
+            button_height = int(popup_height * 0.15)
+            button_y = popup_y + popup_height - button_height - 10
+
+            # Risk It button
+            risk_button_x = popup_x + popup_width // 2 - button_width - 10
+            risk_button = LargeButton(screen, risk_button_x, button_y, "Risk It", button_width, button_height)
+            risk_button.draw(screen)
+
+            # Nah button
+            nah_button_x = popup_x + popup_width // 2 + 10
+            nah_button = LargeButton(screen, nah_button_x, button_y, "Nah", button_width, button_height)
+            nah_button.draw(screen)
+
+            # Handle button click
+            mouse_pos = pygame.mouse.get_pos()
+            mouse_pressed = pygame.mouse.get_pressed()[0]
+
+            if risk_button.is_clicked(mouse_pos) and mouse_pressed:
+                if not hasattr(self, '_button_clicked') or not self._button_clicked:
+                    random_event_manager.resolve_gambling_event(self, risk=True)  # Handle risk
+                    self._button_clicked = True
+
+            if nah_button.is_clicked(mouse_pos) and mouse_pressed:
+                if not hasattr(self, '_button_clicked') or not self._button_clicked:
+                    random_event_manager.resolve_gambling_event(self, risk=False)  # Handle no risk
+                    self._button_clicked = True
+
+            if not mouse_pressed:
+                self._button_clicked = False  # Reset the click lock
+
+
         
     def draw_scroll_bar(self, screen):
         bar_width = int(self.WIDTH * 0.02)
@@ -575,17 +656,90 @@ class AchievementManager:
 
 class RandomEventManager:
     def __init__(self):
-        self.events = ["Golden Cookie", "Cookie Storm", "Cookie Thief"]
+        self.events = ["Golden Cookie", "Cookie Storm", "Gambling"]
+        self.active_events = {}  # Track active events and their end times
+        self.event_multipliers = {}  # Track multipliers for each active event
+        self.show_gambling_popup = False
+        self.event_lock = False  # Lock to prevent overlapping events
 
-    def trigger_event(self):
+
+
+    def trigger_event(self, ui_manager):
+        if hasattr(self, "event_lock") and self.event_lock:  # Prevent overlapping events
+            print("Event lock is active; skipping event.")
+            return
+
+        self.event_lock = True
         event = random.choice(self.events)
+        golden_duration = 10  # Golden Cookie timer
+        storm_duration = 15 # Storm Cookie timer
+
         if event == "Golden Cookie":
-            print("Golden Cookie appeared! Click it for a bonus!")
+            print("Golden Cookie appeared! 10x clicks for 10 seconds!")
+            self.active_events["Golden Cookie"] = time.time() + golden_duration
+            self.event_multipliers["Golden Cookie"] = 10
+            ui_manager.cookie_per_click *= self.event_multipliers["Golden Cookie"]
+
+            # Set the event popup
+            ui_manager.active_event_popup = "Golden Cookie! 10x clicks for 10 seconds!"
+            ui_manager.event_popup_end_time = time.time() + 3  # Show for 3 seconds
+
         elif event == "Cookie Storm":
-            print("Cookie Storm! Double cookies for 10 seconds!")
-        elif event == "Cookie Thief":
-            print("Cookie Thief! Lose 10% of your cookies!")
-        # Implement event effects
+            print("Cookie Storm activated! Double cookies per click for 15 seconds!")
+            self.active_events["Cookie Storm"] = time.time() + storm_duration
+            self.event_multipliers["Cookie Storm"] = 2
+            ui_manager.cookie_per_click *= self.event_multipliers["Cookie Storm"]
+
+            # Set the event popup
+            ui_manager.active_event_popup = "Cookie Storm! Double cookies for 15 seconds!"
+            ui_manager.event_popup_end_time = time.time() + 3  # Show for 3 seconds
+
+        elif event == "Gambling":
+            print("Gambling Event! Risk it all!")
+            self.show_gambling_popup = True  # Show gambling popup
+
+
+
+
+
+    def is_event_active(self, event):
+        """Check if a specific event is active."""
+        return event in self.active_events and time.time() < self.active_events[event]
+
+    def clear_event(self, event, ui_manager):
+        if event in self.active_events and time.time() >= self.active_events[event]:
+            print(f"Ending event '{event}' at time {time.time()}")
+
+            if event in self.event_multipliers:
+                ui_manager.cookie_per_click /= self.event_multipliers[event]
+                del self.event_multipliers[event]
+
+            del self.active_events[event]
+
+            self.event_lock = False  # Release the lock when the event ends
+
+
+    def clear_expired_events(self, ui_manager):
+        for event in list(self.active_events.keys()):
+            if not self.is_event_active(event):
+                self.clear_event(event, ui_manager)
+
+    def resolve_gambling_event(self, ui_manager, risk):
+        if risk:
+            if random.random() <= 0.80:  # 85% chance to double cookies
+                ui_manager.cookie_count *= 5
+                print("Lucky! Your cookies Quintupled!")
+            else:
+                ui_manager.cookie_count = 0
+                print("Unlucky! You lost your cookies!")
+        else:
+            print("You chose not to gamble!")
+
+        # Close the popup
+        self.show_gambling_popup = False
+
+
+
 
 class CookieAnalytics:
     def __init__(self):
@@ -607,7 +761,9 @@ class Game:
         self.ui_manager = UIManager()
         self.achievement_manager = self.ui_manager.achievement_manager  # Ensure both use the same instance
         self.cookie = Cookie(f"{ASSETS_FILEPATH}/cookie.png", 0.2, self.ui_manager.WIDTH, self.ui_manager.HEIGHT)
+        self.random_event_manager = RandomEventManager()  # Initialize RandomEventManager
         self.last_time = time.time()
+        self.last_event_time = time.time()
         self.clock = pygame.time.Clock()
         self.cursor = Cursor(f"{ASSETS_FILEPATH}/cursor/cursor1.png", 1, 64, 64)
         self.background_image = pygame.image.load(f"{ASSETS_FILEPATH}/background/background.png") #background image
@@ -684,21 +840,29 @@ class Game:
 
     # Begins the game and runs in a continuous loop
     def run(self):
-        while True:            
+        while True:
+            current_time = time.time()
             
-            # Run the main game loop if the menu is not active
+            # Update cookies per second every second
+            if current_time - self.last_time >= 1:
+                self.ui_manager.cookie_count += self.ui_manager.cookies_per_second()
+                self.last_time = current_time
+
+            # Trigger a new random event every minute
+            if current_time - self.last_event_time >= 60:
+                print("Attempting to trigger an event...")  # Debugging
+                self.random_event_manager.trigger_event(self.ui_manager)
+                self.last_event_time = current_time
+
+            # Clear expired events
+            self.random_event_manager.clear_expired_events(self.ui_manager)
+
+            # Render the game elements
             if self.ui_manager.show_main_menu:
-                self.ui_manager.screen.blit(self.background_image, (0,0))#draw background for menu
+                self.ui_manager.screen.blit(self.background_image, (0, 0))
                 self.ui_manager.run_main_menu()
             else:
-                # Update cookies per second and game state as usual
-                current_time = time.time()
-                if current_time - self.last_time >= 1:
-                    self.ui_manager.cookie_count += self.ui_manager.cookies_per_second()
-                    self.last_time = current_time
-
-                # Render the game elements
-                self.ui_manager.screen.blit(self.ig_background_image, (0,0)) #draw in game background
+                self.ui_manager.screen.blit(self.ig_background_image, (0, 0))
                 self.cookie.draw(self.ui_manager.screen)
                 self.ui_manager.draw_stats(self.ui_manager.screen)
                 self.ui_manager.draw_upgrades(self.ui_manager.screen)
@@ -706,19 +870,23 @@ class Game:
                 self.ui_manager.draw_partitions(self.ui_manager.screen)
                 self.cookie.update_rotation()
 
-                # Draw the pop-up menu if it's visible
+                # Draw popups, menus, and notifications
                 self.ui_manager.draw_popup_menu(self.ui_manager.screen)
-
                 self.ui_manager.draw_popup_cookie_earned(self.ui_manager.screen)
-
-                # Draw the save button
-                # self.ui_manager.save_button.draw(self.ui_manager.screen)
-
                 self.ui_manager.draw_notifications(self.ui_manager.screen)
+                self.ui_manager.draw_event_popup(self.ui_manager.screen)  # Draw the event popup here
+
+                # Draw the gambling popup if it's active
+                if self.random_event_manager.show_gambling_popup:
+                    self.ui_manager.draw_gambling_popup(self.ui_manager.screen, self.random_event_manager)
+
+
+
+
 
             # Handle events and update display
             self.handle_events()
             self.cursor.update()
             self.cursor.draw()
-            pygame.display.flip()  # Update the screen in Pygame
+            pygame.display.flip()
             self.clock.tick(30)  # Limit the game to 30 ticks per second
