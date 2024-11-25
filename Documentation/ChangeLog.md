@@ -10,6 +10,18 @@
 - Cookie Analytics **(Peter)**
 - Item cost to shop display **(Peter)**
 - Sprint 4 documentation **(Peter)**
+- Cookie click animation **(Jack)**
+
+## November 24 (Sprint 3)
+
+### Added
+
+- Balancing changes for Click Multiplier and Increase Click **(Andrew)**
+- Dynamic buttons for Click Multiplier and Increase Click **(Andrew)**
+- Added dates to the offline notification screen **(Peter)**
+- Cookie Analytics **(Peter)**
+- Item cost to shop display **(Peter)**
+- Sprint 4 documentation **(Peter)**
 
 ## November 23 (Sprint 3)
 
@@ -17,6 +29,11 @@
 
 - Achievements **(Andrew)**
 - Pop-up for when achievements are completed **(Andrew)**
+- Added Temple upgrade (Auto clicker) **(Ian)**
+- Added Gambling event and popup (Risk all cookies for a 5x increase of cookies) **(Ian)**
+- Added Cookie storm event and popup (2x clicks for 15 seconds) **(Ian)**
+- Added Golden cookie event and popup (10x clicks for 10 seconds) **(Ian)**
+- Number simplifier that generates latin suffix correlating to size **(Jack)**
 - Added Temple upgrade (Auto clicker) **(Ian)**
 - Added Gambling event and popup (Risk all cookies for a 5x increase of cookies) **(Ian)**
 - Added Cookie storm event and popup (2x clicks for 15 seconds) **(Ian)**
