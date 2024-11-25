@@ -453,9 +453,9 @@ class UIManager:
         self.draw_text("Analytics:", font, BLACK, x + 10, y)
 
         stats = {
-            "Cookies": f'{self.cookie_count:.3f}',
-            "Cookies Per Click": f'{self.cookie_per_click:.3f}',
-            "Cookies Per Second": f'{self.cookies_per_second():.3f}'
+            "Cookies": f'{self.simplify_number(self.cookie_count)}',
+            "Cookies Per Click": f'{self.simplify_number(self.cookie_per_click)}',
+            "Cookies Per Second": f'{self.simplify_number(self.cookies_per_second())}'
         }
         purchases = {
             "Extra Hands": self.shop_items["Extra Hands"].purchased_count,
@@ -490,7 +490,7 @@ class UIManager:
         for button, item in self.buttons:
             if 0 <= button.y <= self.HEIGHT:  # Only draw buttons within the visible area
                 current_price = int(item.base_cost * (1.15 ** item.purchased_count))
-                button.text = f"{current_price} cookies"
+                button.text = f"{self.simplify_number(current_price)} cookies"
                 button.draw(screen)
 
 
@@ -893,6 +893,7 @@ class Game:
                     if self.cookie.rect.collidepoint(mouse_pos):
                         self.ui_manager.handle_cookie_click()
                         self.achievement_manager.check_achievements(self.ui_manager.cookie_count)
+                        self.cookie.animate()
                         self.ui_manager.draw_text(f"+{self.ui_manager.simplify_number(self.ui_manager.cookie_per_click)}", self.ui_manager.font, BLACK, int(mouse_pos[0]-26), int(mouse_pos[1]-30))
                     
                     # Moved functionality into the popup menu 
@@ -949,6 +950,8 @@ class Game:
                 self.ui_manager.draw_shop(self.ui_manager.screen)
                 self.ui_manager.draw_partitions(self.ui_manager.screen)
                 self.cookie.update_rotation()
+                self.cookie.draw_shimmer(self.ui_manager.screen)
+                self.cookie.update_shimmer()
 
                 # Draw popups, menus, and notifications
                 self.ui_manager.draw_popup_menu(self.ui_manager.screen)
