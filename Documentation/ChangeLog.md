@@ -1,5 +1,13 @@
 # Change Log
 
+## November 26 (Sprint 4)
+
+### Added
+- Cursor click animation **(Jack)**
+
+### Modified
+- changes to cursor.py to add animation **(Jack)**
+
 ## November 24 (Sprint 3)
 
 ### Added

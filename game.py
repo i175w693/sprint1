@@ -152,9 +152,10 @@ class UIManager:
                 # Calculate the current price
                 current_price = int(item.base_cost * (1.15 ** item.purchased_count))
 
-                # Handle custom price increment for Click Multipliers and Increase Clicks
-                if item.name.startswith("Click Multiplier") or item.name.startswith("Increase Click"):
-                    current_price = item.base_cost
+                # Handle custom price increment for Click Multipliers and Increase Clicks (commented out for now)
+
+                #if item.name.startswith("Click Multiplier") or item.name.startswith("Increase Click"):
+                #    current_price = item.base_cost
 
                 # Only proceed if the player has enough cookies
                 if self.cookie_count >= current_price:
@@ -487,11 +488,13 @@ class UIManager:
         self.draw_text("Shop:", font, BLACK, int(self.WIDTH * 0.75), int(self.HEIGHT * 0.05))
         
         # Draw shop items
+        font_size = int(self.WIDTH * 0.015) #change shop text size
+        font = get_font(font_size)
         for button, item in self.buttons:
             if 0 <= button.y <= self.HEIGHT:  # Only draw buttons within the visible area
                 current_price = int(item.base_cost * (1.15 ** item.purchased_count))
                 button.text = f"{self.simplify_number(current_price)} cookies"
-                button.draw(screen)
+                button.draw(screen, font)
 
 
 
@@ -906,6 +909,7 @@ class Game:
                         self.ui_manager.handle_popup_click()
 
                     self.ui_manager.handle_shop_click(mouse_pos)
+                self.cursor.animate()
 
             # Handle window resizing
             if event.type == pygame.VIDEORESIZE:
@@ -971,5 +975,6 @@ class Game:
             self.handle_events()
             self.cursor.update()
             self.cursor.draw()
+            self.cursor.update_sprite()
             pygame.display.flip()
             self.clock.tick(30)  # Limit the game to 30 ticks per second
