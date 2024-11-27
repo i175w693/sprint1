@@ -4,7 +4,7 @@ Purpose: This module handles the drawing of all of the buttons for the game
 Inputs: None
 Output: None
 Additional code sources: 
-Developers: Ian Wilson, Andrew Uriell, Peter Pham
+Developers: Ian Wilson, Andrew Uriell, Peter Pham, Jack Youngquist
 Date: 10/24/2024
 Last Modified: 10/26/2024
 '''
@@ -27,7 +27,9 @@ class Button:
         text_obj = font.render(text, True, color)
         screen.blit(text_obj, (x, y))
 
-    def draw(self, screen):
+    def draw(self, screen, custom_font):
+        if custom_font != False: #check if custom font was passed in, if so switch to that font
+            self.font = custom_font
         if self.image_file is not None:
             IMAGE = pygame.transform.scale(pygame.image.load(self.image_file).convert_alpha(), (self.rect.width, self.rect.height))
             screen.blit(IMAGE, self.rect)
@@ -62,8 +64,8 @@ class LargeButton(Button):
         self.y = y  # Ensure y is stored
         super().__init__(x, y, width, height, text, int(height * 0.5), image_file)  # Initialize the base class
 
-    def draw(self, screen):
-        super().draw(self.screen)  # Use the stored screen for drawing
+    def draw(self, screen, custom_font = False):
+        super().draw(self.screen, custom_font)  # Use the stored screen for drawing
 
 
 
