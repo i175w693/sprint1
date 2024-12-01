@@ -6,6 +6,7 @@
 
 - Documentation for Sprint 4 **(Peter)**
 - Background for the middle column so viewing upgrades text is easier **(Peter)**
+- Starter code for the prestige mechanism **(Peter)**
 
 ## November 26 (Sprint 4)
 

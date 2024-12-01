@@ -9,7 +9,7 @@
 
 ### Peter Pham
 
-- .5 (12/1)
+- 1.5 (12/1)
 
 ### Ian Wilson
 

@@ -12,5 +12,6 @@
 - [ ] Bug Fixes / Testing
   - [ ] Fix Achievement 'Locked' Indicator in settings
   - [ ] Fix display bug of upgrade prices
+  - [ ] Event lock remains active after the gambling event
 - [ ] Save Slot Selection
 - [ ] Documentation

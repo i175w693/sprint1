@@ -23,6 +23,7 @@ from save_game import save
 from load_game import load
 from sound import SoundManager
 from cursor import Cursor
+from prestige import *
 
 # Initialize pygame's video system
 pygame.init()
@@ -81,6 +82,7 @@ class UIManager:
         self.active_event_popup = None
         self.event_popup_end_time = None
         self.last_played_timestamp = None
+        self.show_prestige_menu = False
 
 
     """Check if a specific button was clicked based on label and mouse position."""
@@ -544,7 +546,14 @@ class UIManager:
         """Toggles the visibility of the pop-up menu."""
         self.show_popup = not self.show_popup  # Toggle the pop-up menu
 
+    def handle_prestige_click(self):
+        self.show_prestige_menu = not self.show_prestige_menu  # Toggles the prestige menu
         
+
+    def draw_prestige_menu(self):
+        if self.show_prestige_menu:
+            pass
+
     # renders the settings screen
     def draw_settings_popup(self):
         # Draw settings background
@@ -711,6 +720,19 @@ class UIManager:
                 self.achievement_manager.notifications.pop(0)
                 self.notification_start_time = None
 
+    def draw_prestige_menu_button(self):
+        # Draw the "Pop-up Menu" button (to the right of the upgrades text)
+        button_width = int(self.WIDTH * 0.1)
+        button_height = int(self.HEIGHT * 0.05)
+        button_x = int(self.WIDTH * 0.25) + 150  # Position it to the right of the text
+        button_y = int(self.HEIGHT * 0.005)
+
+        self.prestige_button = LargeButton(self.screen, button_x, button_y, "Prestige Menu", button_width, button_height)
+
+        # Draw the button on the screen
+        self.prestige_button.draw(self.screen)
+
+
 class AchievementManager:
     def __init__(self):
         self.achievements = {
@@ -853,6 +875,7 @@ class Game:
         self.background_image = pygame.transform.scale(self.background_image, (self.ui_manager.WIDTH, self.ui_manager.HEIGHT))#scale background image
         self.ig_background_image = pygame.image.load(f"{ASSETS_FILEPATH}/background/in_game_background.png") #in game background
         self.ig_background_image = pygame.transform.scale(self.ig_background_image, (self.ui_manager.WIDTH, self.ui_manager.HEIGHT))#scale in game background image
+        self.prestige = Prestige(self.ui_manager)
 
     # checks each event that occurs in pygame and updates the game accordingly.
     def handle_events(self):
@@ -907,6 +930,9 @@ class Game:
                     
                     if self.ui_manager.popup_button.is_clicked(mouse_pos):
                         self.ui_manager.handle_popup_click()
+                    
+                    if self.ui_manager.prestige_button.is_clicked(mouse_pos):
+                        self.ui_manager.handle_prestige_click()
 
                     self.ui_manager.handle_shop_click(mouse_pos)
                 self.cursor.animate()
@@ -963,13 +989,11 @@ class Game:
                 self.ui_manager.draw_popup_cookie_earned(self.ui_manager.screen)
                 self.ui_manager.draw_notifications(self.ui_manager.screen)
                 self.ui_manager.draw_event_popup(self.ui_manager.screen)  # Draw the event popup here
+                self.ui_manager.draw_prestige_menu_button()
 
                 # Draw the gambling popup if it's active
                 if self.random_event_manager.show_gambling_popup:
                     self.ui_manager.draw_gambling_popup(self.ui_manager.screen, self.random_event_manager)
-
-
-
 
 
             # Handle events and update display
