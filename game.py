@@ -809,7 +809,7 @@ class RandomEventManager:
 
     def resolve_gambling_event(self, ui_manager, risk):
         if risk:
-            if random.random() <= 0.80:  # 85% chance to double cookies
+            if random.random() <= 0.80:  # 80% chance to double cookies
                 ui_manager.cookie_count *= 5
                 print("Lucky! Your cookies Quintupled!")
             else:
@@ -948,6 +948,7 @@ class Game:
                 self.ui_manager.run_main_menu()
             else:
                 self.ui_manager.screen.blit(self.ig_background_image, (0, 0))
+                pygame.draw.rect(self.ui_manager.screen, (212, 179, 127), ((self.ui_manager.WIDTH - int(self.ui_manager.WIDTH * 0.25)) // 2, int(self.ui_manager.HEIGHT * 0.1), int(self.ui_manager.WIDTH * 0.25), int(self.ui_manager.HEIGHT * 0.8)))
                 self.cookie.draw(self.ui_manager.screen)
                 self.ui_manager.draw_stats(self.ui_manager.screen)
                 self.ui_manager.draw_upgrades(self.ui_manager.screen)

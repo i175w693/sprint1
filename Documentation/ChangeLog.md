@@ -1,11 +1,20 @@
 # Change Log
 
+## December 1 (Sprint 4)
+
+### Added
+
+- Documentation for Sprint 4 **(Peter)**
+- Background for the middle column so viewing upgrades text is easier **(Peter)**
+
 ## November 26 (Sprint 4)
 
 ### Added
+
 - Cursor click animation **(Jack)**
 
 ### Modified
+
 - changes to cursor.py to add animation **(Jack)**
 
 ## November 24 (Sprint 3)
