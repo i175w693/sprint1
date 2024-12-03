@@ -2,7 +2,7 @@
 
 ## TODO
 
-- [ ] Background Music
+- [X] Background Music
 - [ ] Options Menu
 - [ ] Prestige Mode
 - [ ] Prestige Upgrades

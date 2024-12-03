@@ -419,6 +419,7 @@ class UIManager:
                             self.show_popup = False  # Close the pop-up when the button is clicked
                         elif label == "Toggle Sound":
                             self.sound_manager.toggle_sound()  # Toggle sound on/off
+                            self.sound_manager.play_music()
                         elif label == "Quit":
                             pygame.quit()  # Quit the game
                             quit()  # Close the game completely
@@ -876,6 +877,7 @@ class Game:
         self.ig_background_image = pygame.image.load(f"{ASSETS_FILEPATH}/background/in_game_background.png") #in game background
         self.ig_background_image = pygame.transform.scale(self.ig_background_image, (self.ui_manager.WIDTH, self.ui_manager.HEIGHT))#scale in game background image
         self.prestige = Prestige(self.ui_manager)
+        self.sound_manager = SoundManager()
 
     # checks each event that occurs in pygame and updates the game accordingly.
     def handle_events(self):
@@ -951,6 +953,7 @@ class Game:
 
     # Begins the game and runs in a continuous loop
     def run(self):
+        self.sound_manager.play_music()
         while True:
             current_time = time.time()
             
