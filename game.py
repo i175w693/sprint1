@@ -371,6 +371,7 @@ class UIManager:
     # Modify this method to handle button clicks properly in the popup menu
     def draw_popup_menu(self, screen):
         if self.show_popup:
+            print("I am here too")
             popup_width = int(self.WIDTH * 0.7)
             popup_height = int(self.HEIGHT * 1)
             popup_x = (self.WIDTH - popup_width) 
@@ -421,6 +422,7 @@ class UIManager:
                             self.sound_manager.toggle_sound()  # Toggle sound on/off
                             self.sound_manager.play_music()
                         elif label == "Quit":
+                            print("I quit")
                             pygame.quit()  # Quit the game
                             quit()  # Close the game completely
                     else:
@@ -520,8 +522,6 @@ class UIManager:
             self.active_event_popup = None  # Clear the popup when time expires
 
 
-
-
     # Draws vertical lines to partition the screen
     def draw_partitions(self, screen):
         pygame.draw.line(screen, GRAY, (self.WIDTH * 0.33, 0), (self.WIDTH * 0.33, self.HEIGHT), 2)  # Left partition
@@ -543,10 +543,13 @@ class UIManager:
     def draw_save_slots(self):
         pass
 
-
     def handle_popup_click(self):
         """Toggles the visibility of the pop-up menu."""
         self.show_popup = not self.show_popup  # Toggle the pop-up menu
+    
+    def handle_setting_popup_click(self):
+        """Toggles the visibility of the pop-up menu."""
+        self.show_settings_popup = not self.show_settings_popup  # Toggle the pop-up menu
 
     def handle_prestige_click(self):
         self.show_prestige_menu = not self.show_prestige_menu  # Toggles the prestige menu
@@ -556,24 +559,70 @@ class UIManager:
         if self.show_prestige_menu:
             pass
 
-    # renders the settings screen
-    def draw_settings_popup(self):
-        # Draw settings background
-        popup_width = int(self.WIDTH * 0.5)
-        popup_height = int(self.HEIGHT * 0.5)
-        popup_x = (self.WIDTH - popup_width) // 2
-        popup_y = (self.HEIGHT - popup_height) // 2
-        pygame.draw.rect(self.screen, GRAY, (popup_x, popup_y, popup_width, popup_height))
+    # renders the settings screen -- TWEAK ME
+    def draw_settings_popup(self, screen):
+        if self.show_settings_popup:
+            popup_width = int(self.WIDTH * 0.98)
+            popup_height = int(self.HEIGHT * 0.98)
+            popup_x = (self.WIDTH - popup_width) // 2
+            popup_y = (self.HEIGHT - popup_height) // 2  # Center the popup vertically
+            
+            # Draw the popup background
+            pygame.draw.rect(screen, GRAY, (popup_x, popup_y, popup_width, popup_height))
 
-        # Settings sliders and labels
-        settings_font = get_font(int(popup_height * 0.1))
-        self.draw_text("Settings", settings_font, BLACK, popup_x + popup_width // 2 - settings_font.size("Settings")[0] // 2, popup_y + 10)
+            # Draw the title of the popup
+            title_font = get_font(int(popup_height * 0.1))
+            title_text = "Settings"
+            self.draw_text(title_text, title_font, BLACK, popup_x + popup_width // 2 - title_font.size(title_text)[0] // 2, popup_y + 10)
 
-        # Draw slider bars and labels
-        labels = ["Music", "SFX"]
-        for i, label in enumerate(labels):
-            y_pos = popup_y + int(popup_height * 0.3) + i * int(popup_height * 0.2)
-            self.draw_slider(label, popup_x + int(popup_width * 0.1), y_pos, popup_width, popup_height)
+            # Define the buttons and their labels
+            button_labels = ["Save Game", "Close Menu", "Toggle Sound", "Quit"]
+            
+            # Set button properties
+            button_width = int(popup_width * 0.2)  # Adjust the button width based on the popup size
+            button_height = int(popup_height * 0.1)  # Set a reasonable button height
+
+            # Calculate the vertical position of the buttons (one row of buttons at the bottom)
+            button_y = popup_y + popup_height - button_height - 10
+            
+            # Space out the buttons horizontally based on the number of buttons
+            spacing = (popup_width - len(button_labels) * button_width) // (len(button_labels) + 1)  # Space between buttons
+
+            # Loop through the button labels and create the buttons
+            for index, label in enumerate(button_labels):
+                # Calculate the x-position of the current button
+                button_x = popup_x + (index + 1) * spacing + index * button_width
+                button = LargeButton(screen, button_x, button_y, label, button_width, button_height)
+                button.draw(screen)
+
+                # Handle the button click based on its label
+                mouse_pos = pygame.mouse.get_pos()
+                mouse_pressed = pygame.mouse.get_pressed()[0]  # Left mouse button pressed (0 = left, 1 = middle, 2 = right)
+
+                # Ensure the click is only handled once (we prevent double-clicking the button)
+                if button.is_clicked(mouse_pos) and mouse_pressed:
+                    print("Trying a button")
+                    if not hasattr(self, '_button_clicked') or not self._button_clicked:
+                        self._button_clicked = True  # Lock the button to avoid multiple triggers
+                        self.sound_manager.play_sound("menu-click")
+                        if label == "Save Game":
+                            save(self)  # Handle the save game action
+                        elif label == "Close Menu":
+                            self.show_settings_popup = False  # Close the pop-up when the button is clicked
+                        elif label == "Toggle Sound":
+                            self.sound_manager.toggle_sound()  # Toggle sound on/off
+                            #self.sound_manager.play_music()
+                        elif label == "Quit":
+                            pygame.quit()  # Quit the game
+                            quit()  # Close the game completely
+                    else:
+                        # If the button was already clicked, do nothing (debounced)
+                        pass
+
+                # Reset the click lock when the mouse button is released
+                if not mouse_pressed:
+                    if hasattr(self, '_button_clicked') and self._button_clicked:
+                        self._button_clicked = False  # Unlock the button when the button is released
 
     # renders the sliders used in the settings menu
     def draw_slider(self, label, x, y, popup_width, popup_height):
@@ -879,6 +928,7 @@ class Game:
         self.ig_background_image = pygame.transform.scale(self.ig_background_image, (self.ui_manager.WIDTH, self.ui_manager.HEIGHT))#scale in game background image
         self.prestige = Prestige(self.ui_manager)
         self.sound_manager = SoundManager()
+        
 
     # checks each event that occurs in pygame and updates the game accordingly.
     def handle_events(self):
@@ -898,8 +948,7 @@ class Game:
             # Handle mouse clicks
             if event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_pos = pygame.mouse.get_pos()
-            
-                if self.ui_manager.show_main_menu:
+                if self.ui_manager.show_main_menu and not self.ui_manager.show_settings_popup:
                     # Handle main menu button clicks
                     if self.ui_manager.button_clicked("Continue", mouse_pos):
                         self.ui_manager = UIManager(self.achievement_manager) # recreates a new UIManager to populate with the save file's data
@@ -913,10 +962,12 @@ class Game:
                         self.ui_manager.start_new_game()  # Start a new game with initial values
                         self.ui_manager.show_main_menu = False
                     elif self.ui_manager.button_clicked("Settings", mouse_pos):
-                        self.ui_manager.show_settings_popup = True
+                        self.ui_manager.handle_setting_popup_click()
                     elif self.ui_manager.button_clicked("Exit", mouse_pos):
                         pygame.quit()
                         sys.exit()
+                elif self.ui_manager.show_settings_popup:
+                    pass
                 else:
                     # Handle game-related clicks
                     if self.cookie.rect.collidepoint(mouse_pos):
@@ -976,6 +1027,9 @@ class Game:
             if self.ui_manager.show_main_menu:
                 self.ui_manager.screen.blit(self.background_image, (0, 0))
                 self.ui_manager.run_main_menu()
+                self.ui_manager.draw_settings_popup(self.ui_manager.screen)
+                print(f"show_settings_popup: {self.ui_manager.show_settings_popup}")
+
             else:
                 self.ui_manager.screen.blit(self.ig_background_image, (0, 0))
                 pygame.draw.rect(self.ui_manager.screen, (212, 179, 127), ((self.ui_manager.WIDTH - int(self.ui_manager.WIDTH * 0.25)) // 2, int(self.ui_manager.HEIGHT * 0.1), int(self.ui_manager.WIDTH * 0.25), int(self.ui_manager.HEIGHT * 0.8)))
