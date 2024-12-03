@@ -45,7 +45,7 @@ from buttons import Button, SmallButton, LargeButton
 
 # UIManager class responsible for rendering the screen of the game and handling some of the backend such as shop items and user balances
 class UIManager:
-    def __init__(self):
+    def __init__(self, achievement_manager):
         self.WIDTH = pygame.display.Info().current_w # sets the width to the current window's width for calculation purposes
         self.HEIGHT = pygame.display.Info().current_h # sets the height to the current window's height for calculation purposes
         self.cookie_count = 0
@@ -76,7 +76,7 @@ class UIManager:
         self.show_popup = False
         self.bonus_cookies = 0
         self.show_popup_cookie_earned = False
-        self.achievement_manager = AchievementManager()  # Initialize AchievementManager
+        self.achievement_manager = achievement_manager  # Initialize AchievementManager
         self.notification_duration = 3  # Duration to display each notification in seconds
         self.notification_start_time = None
         self.active_event_popup = None
@@ -439,6 +439,7 @@ class UIManager:
             self.draw_analytics(screen, popup_x, popup_y + int(popup_height * 0.3), popup_width)
 
     def draw_achievements(self, screen, x, y, width):
+        #print(f"Achievements state: {self.achievement_manager.achievements}")
         font_size = int(self.WIDTH * 0.02)  # Dynamic font size based on width
         font = get_font(font_size)
         self.draw_text("Achievements:", font, BLACK, x + 10, y)
@@ -864,8 +865,8 @@ class CookieAnalytics:
 class Game:
     # initializes the UI and time keeping functions
     def __init__(self):
-        self.ui_manager = UIManager()
-        self.achievement_manager = self.ui_manager.achievement_manager  # Ensure both use the same instance
+        self.achievement_manager = AchievementManager()
+        self.ui_manager = UIManager(self.achievement_manager)
         self.cookie = Cookie(f"{ASSETS_FILEPATH}/cookie.png", 0.2, self.ui_manager.WIDTH, self.ui_manager.HEIGHT)
         self.random_event_manager = RandomEventManager()  # Initialize RandomEventManager
         self.last_time = time.time()
@@ -901,10 +902,10 @@ class Game:
                 if self.ui_manager.show_main_menu:
                     # Handle main menu button clicks
                     if self.ui_manager.button_clicked("Continue", mouse_pos):
-                        self.ui_manager = UIManager() # recreates a new UIManager to populate with the save file's data
+                        self.ui_manager = UIManager(self.achievement_manager) # recreates a new UIManager to populate with the save file's data
                         # Load the game state when Continue is clicked
                         if load(self.ui_manager) == None: # if a save file doesnt exist, create a new save
-                            self.ui_manager = UIManager() # recreates a new UIManager with empty stats
+                            self.ui_manager = UIManager(self.achievement_manager) # recreates a new UIManager with empty stats
                             self.ui_manager.show_main_menu = False
                         else: # else load the save file
                             self.ui_manager.show_main_menu = False  # Hide the main menu after loading
@@ -944,7 +945,7 @@ class Game:
                 self.ui_manager.WIDTH, self.ui_manager.HEIGHT = event.w, event.h
                 self.ui_manager.screen = pygame.display.set_mode((self.ui_manager.WIDTH, self.ui_manager.HEIGHT), pygame.RESIZABLE)
                 self.cookie = Cookie(f"{ASSETS_FILEPATH}/cookie.png", 0.2, self.ui_manager.WIDTH, self.ui_manager.HEIGHT)
-                self.ui_manager = UIManager()
+                self.ui_manager = UIManager(self.achievement_manager)
 
             # Handle mouse wheel scrolling
             if event.type == pygame.MOUSEWHEEL:
