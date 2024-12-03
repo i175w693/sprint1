@@ -38,5 +38,16 @@ class SoundManager:
         global sound_enabled
         sound_enabled = not sound_enabled
         print("Sound Enabled:", sound_enabled)
+    
+    def play_music(self, assets_path='./assets/sounds'):
+        """Plays the background music on loop if sound is enabled."""
+        global sound_enabled
+        if sound_enabled:
+            pygame.mixer.music.load(f"{assets_path}/smooth-coffee.mp3")
+            pygame.mixer.music.play(loops=-1)  # Loop forever
+            print("Background music started.")
+        else:
+            pygame.mixer.music.stop()  # Stop the music
+            print("Sound is disabled. Background music will not play.")
 
 
