@@ -1,5 +1,15 @@
 # Change Log
 
+## December 5 (Sprint 4)
+
+### Added
+
+- Prestige Menu and class methods **(Peter)**
+
+### Modified
+
+- Fixed bugs related to popup menus **(Peter)**
+
 ## December 1 (Sprint 4)
 
 ### Added

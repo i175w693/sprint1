@@ -6,7 +6,7 @@ Output: None
 Additional code sources: 
 Developers: Ian Wilson, Andrew Uriell, Peter Pham, Michael Oliver, Jack Youngquist
 Date: 10/24/2024
-Last Modified: 11/10/2024
+Last Modified: 12/5/2024
 '''
 
 import pygame
@@ -82,7 +82,6 @@ class UIManager:
         self.active_event_popup = None
         self.event_popup_end_time = None
         self.last_played_timestamp = None
-        self.show_prestige_menu = False
 
 
     """Check if a specific button was clicked based on label and mouse position."""
@@ -371,7 +370,6 @@ class UIManager:
     # Modify this method to handle button clicks properly in the popup menu
     def draw_popup_menu(self, screen):
         if self.show_popup:
-            print("I am here too")
             popup_width = int(self.WIDTH * 0.7)
             popup_height = int(self.HEIGHT * 1)
             popup_x = (self.WIDTH - popup_width) 
@@ -439,6 +437,10 @@ class UIManager:
 
             # Draw analytics
             self.draw_analytics(screen, popup_x, popup_y + int(popup_height * 0.3), popup_width)
+        
+            return True
+        else:
+            return False
 
     def draw_achievements(self, screen, x, y, width):
         #print(f"Achievements state: {self.achievement_manager.achievements}")
@@ -550,15 +552,7 @@ class UIManager:
     def handle_setting_popup_click(self):
         """Toggles the visibility of the pop-up menu."""
         self.show_settings_popup = not self.show_settings_popup  # Toggle the pop-up menu
-
-    def handle_prestige_click(self):
-        self.show_prestige_menu = not self.show_prestige_menu  # Toggles the prestige menu
         
-
-    def draw_prestige_menu(self):
-        if self.show_prestige_menu:
-            pass
-
     # renders the settings screen -- TWEAK ME
     def draw_settings_popup(self, screen):
         if self.show_settings_popup:
@@ -783,7 +777,6 @@ class UIManager:
         # Draw the button on the screen
         self.prestige_button.draw(self.screen)
 
-
 class AchievementManager:
     def __init__(self):
         self.achievements = {
@@ -986,9 +979,10 @@ class Game:
                         self.ui_manager.handle_popup_click()
                     
                     if self.ui_manager.prestige_button.is_clicked(mouse_pos):
-                        self.ui_manager.handle_prestige_click()
+                        self.prestige.handle_prestige_click()
 
-                    self.ui_manager.handle_shop_click(mouse_pos)
+                    if not self.ui_manager.draw_popup_menu and not self.prestige.draw_prestige_menu:
+                        self.ui_manager.handle_shop_click(mouse_pos)
                 self.cursor.animate()
 
             # Handle window resizing
@@ -1043,11 +1037,15 @@ class Game:
                 self.cookie.update_shimmer()
 
                 # Draw popups, menus, and notifications
-                self.ui_manager.draw_popup_menu(self.ui_manager.screen)
                 self.ui_manager.draw_popup_cookie_earned(self.ui_manager.screen)
                 self.ui_manager.draw_notifications(self.ui_manager.screen)
                 self.ui_manager.draw_event_popup(self.ui_manager.screen)  # Draw the event popup here
-                self.ui_manager.draw_prestige_menu_button()
+                if self.ui_manager.draw_popup_menu(self.ui_manager.screen):
+                    pass
+                elif self.prestige.draw_prestige_menu():
+                    pass
+                else:
+                    self.ui_manager.draw_prestige_menu_button()
 
                 # Draw the gambling popup if it's active
                 if self.random_event_manager.show_gambling_popup:

@@ -6,18 +6,17 @@ Output: None
 Additional code sources: 
 Developers: Ian Wilson, Andrew Uriell, Peter Pham, Jack Youngquist
 Date: 10/24/2024
-Last Modified: 10/26/2024
+Last Modified: 12/5/2024
 '''
 
 import pygame
-from game import get_font, WHITE, BUTTON_COLOR
 
 # Base class for buttons
 class Button:
     def __init__(self, x, y, width, height, text, font_size, image_file):
         self.rect = pygame.Rect(x, y, width, height)
         self.text = text
-        self.font = get_font(font_size)
+        self.font = pygame.font.SysFont(None, font_size)
         self.image_file = image_file
         self.x = x
         self.y = y
@@ -33,10 +32,10 @@ class Button:
         if self.image_file is not None:
             IMAGE = pygame.transform.scale(pygame.image.load(self.image_file).convert_alpha(), (self.rect.width, self.rect.height))
             screen.blit(IMAGE, self.rect)
-            self.draw_text(self.text, self.font, WHITE, self.rect.x + 10, self.rect.y + 5, screen)
+            self.draw_text(self.text, self.font, (255,255,255), self.rect.x + 10, self.rect.y + 5, screen)
         else:
-            pygame.draw.rect(screen, BUTTON_COLOR, self.rect)
-            self.draw_text(self.text, self.font, WHITE, self.rect.x + 10, self.rect.y + 5, screen)
+            pygame.draw.rect(screen, (100, 100, 255), self.rect)
+            self.draw_text(self.text, self.font, (255,255,255), self.rect.x + 10, self.rect.y + 5, screen)
 
     def is_clicked(self, mouse_pos):
         """Returns True if the button is clicked and the mouse position is over the button."""
