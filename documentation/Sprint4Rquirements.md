@@ -7,10 +7,10 @@
   - [X] Tweak Options Menu to have toggle sound and toggle music
   - [ ] Add Basic explaination of controls
 - [X] Prestige Mode
-- [ ] Prestige Upgrades
-  - [ ] Upgrade 1
-  - [ ] Upgrade 2
-  - [ ] Upgrade 3
+- [X] Prestige Upgrades
+  - [X] Upgrade 1
+  - [X] Upgrade 2
+  - [X] Upgrade 3
 - [X] Bug Fixes / Testing
   - [X] Fix Achievement 'Locked' Indicator in settings
   - [X] Fix display bug of upgrade prices

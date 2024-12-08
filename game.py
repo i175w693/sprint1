@@ -45,7 +45,7 @@ from buttons import Button, SmallButton, LargeButton
 
 # UIManager class responsible for rendering the screen of the game and handling some of the backend such as shop items and user balances
 class UIManager:
-    def __init__(self, achievement_manager):
+    def __init__(self, achievement_manager, prestige):
         self.WIDTH = pygame.display.Info().current_w # sets the width to the current window's width for calculation purposes
         self.HEIGHT = pygame.display.Info().current_h # sets the height to the current window's height for calculation purposes
         self.cookie_count = 0
@@ -86,6 +86,7 @@ class UIManager:
         self.active_event_popup = None
         self.event_popup_end_time = None
         self.last_played_timestamp = None
+        self.prestige = prestige
 
 
     """Check if a specific button was clicked based on label and mouse position."""
@@ -221,7 +222,8 @@ class UIManager:
 
     # returns the amount of cookies the user should be earning per second based on the purchased items
     def cookies_per_second(self):
-        return sum(item.cps * item.purchased_count for item in self.shop_items.values() if item.cps != None)
+        return sum(item.cps * item.purchased_count for item in self.shop_items.values() if item.cps != None) + \
+        sum(item.cps * item.purchased_count for (key,item) in self.prestige.get_shop_items() if item.cps != None)
     
     # generates Latin suffix from number given by simplify number
     def get_suffix(self, illion):
@@ -1048,7 +1050,8 @@ class Game:
     # initializes the UI and time keeping functions
     def __init__(self):
         self.achievement_manager = AchievementManager()
-        self.ui_manager = UIManager(self.achievement_manager)
+        self.prestige = Prestige()
+        self.ui_manager = UIManager(self.achievement_manager, self.prestige)
         self.cookie = Cookie(f"{ASSETS_FILEPATH}/cookie.png", 0.2, self.ui_manager.WIDTH, self.ui_manager.HEIGHT)
         self.random_event_manager = RandomEventManager()  # Initialize RandomEventManager
         self.last_time = time.time()
@@ -1059,7 +1062,6 @@ class Game:
         self.background_image = pygame.transform.scale(self.background_image, (self.ui_manager.WIDTH, self.ui_manager.HEIGHT))#scale background image
         self.ig_background_image = pygame.image.load(f"{ASSETS_FILEPATH}/background/in_game_background.png") #in game background
         self.ig_background_image = pygame.transform.scale(self.ig_background_image, (self.ui_manager.WIDTH, self.ui_manager.HEIGHT))#scale in game background image
-        self.prestige = Prestige()
         self.sound_manager = SoundManager()
         
 
@@ -1097,19 +1099,19 @@ class Game:
                 elif self.ui_manager.show_saves_menu and self.ui_manager.show_main_menu:
                     self.ui_manager.draw_save_slots_popup(self.ui_manager.screen)
                     if self.ui_manager.selected_save == 'save1.txt':
-                        self.ui_manager = UIManager(self.achievement_manager) # recreates a new UIManager to populate with the save file's data
+                        self.ui_manager = UIManager(self.achievement_manager, self.prestige) # recreates a new UIManager to populate with the save file's data
                         self.ui_manager.selected_save = 'save1.txt'
                         # Load the game state when Continue is clicked
                         load(self.ui_manager, self.ui_manager.selected_save) # if == None: a save file doesnt exist, create a new save
                         self.ui_manager.show_main_menu = False  # Hide the main menu after loading
                     elif self.ui_manager.selected_save == 'save2.txt':
-                        self.ui_manager = UIManager(self.achievement_manager) # recreates a new UIManager to populate with the save file's data
+                        self.ui_manager = UIManager(self.achievement_manager, self.prestige) # recreates a new UIManager to populate with the save file's data
                         self.ui_manager.selected_save = 'save2.txt'
                         # Load the game state when Continue is clicked
                         load(self.ui_manager, self.ui_manager.selected_save) # if == None: a save file doesnt exist, create a new save
                         self.ui_manager.show_main_menu = False  # Hide the main menu after loading
                     elif self.ui_manager.selected_save == 'save3.txt':
-                        self.ui_manager = UIManager(self.achievement_manager) # recreates a new UIManager to populate with the save file's data
+                        self.ui_manager = UIManager(self.achievement_manager, self.prestige) # recreates a new UIManager to populate with the save file's data
                         self.ui_manager.selected_save = 'save3.txt'
                         # Load the game state when Continue is clicked
                         load(self.ui_manager, self.ui_manager.selected_save) # if == None: a save file doesnt exist, create a new save
@@ -1175,7 +1177,7 @@ class Game:
                 self.ui_manager.WIDTH, self.ui_manager.HEIGHT = event.w, event.h
                 self.ui_manager.screen = pygame.display.set_mode((self.ui_manager.WIDTH, self.ui_manager.HEIGHT), pygame.RESIZABLE)
                 self.cookie = Cookie(f"{ASSETS_FILEPATH}/cookie.png", 0.2, self.ui_manager.WIDTH, self.ui_manager.HEIGHT)
-                self.ui_manager = UIManager(self.achievement_manager)
+                self.ui_manager = UIManager(self.achievement_manager, self.prestige)
 
             # Handle mouse wheel scrolling
             if event.type == pygame.MOUSEWHEEL:
