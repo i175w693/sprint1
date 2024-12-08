@@ -1059,7 +1059,7 @@ class Game:
         self.background_image = pygame.transform.scale(self.background_image, (self.ui_manager.WIDTH, self.ui_manager.HEIGHT))#scale background image
         self.ig_background_image = pygame.image.load(f"{ASSETS_FILEPATH}/background/in_game_background.png") #in game background
         self.ig_background_image = pygame.transform.scale(self.ig_background_image, (self.ui_manager.WIDTH, self.ui_manager.HEIGHT))#scale in game background image
-        self.prestige = Prestige(self.ui_manager)
+        self.prestige = Prestige()
         self.sound_manager = SoundManager()
         
 
@@ -1228,7 +1228,7 @@ class Game:
                 self.ui_manager.draw_event_popup(self.ui_manager.screen)  # Draw the event popup here
                 if self.ui_manager.draw_popup_menu(self.ui_manager.screen):
                     pass
-                elif self.prestige.draw_prestige_menu():
+                elif self.prestige.draw_prestige_menu(self.ui_manager):
                     pass
                 else:
                     self.ui_manager.draw_prestige_menu_button()

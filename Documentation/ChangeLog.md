@@ -8,6 +8,7 @@
 - Fixed event lock for gambling event **(Andrew)**
 - Fixed display bug of upgrades prices **(Andrew)**
 - Support for multiple save slots **(Jack)**
+- Finished Prestige Menu **(Peter)**
 
 ### Modified
 

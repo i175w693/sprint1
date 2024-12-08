@@ -5,7 +5,7 @@
 - [X] Background Music
 - [X] Options Menu
   - [X] Tweak Options Menu to have toggle sound and toggle music
-  - [ ] Add Basic explaination of controls 
+  - [ ] Add Basic explaination of controls
 - [X] Prestige Mode
 - [ ] Prestige Upgrades
   - [ ] Upgrade 1
