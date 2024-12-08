@@ -6,7 +6,7 @@ Output: None
 Additional code sources: 
 Developers: Ian Wilson, Andrew Uriell, Peter Pham, Michael Oliver, Jack Youngquist
 Date: 10/24/2024
-Last Modified: 12/5/2024
+Last Modified: 12/7/2024
 '''
 
 import pygame
@@ -62,7 +62,11 @@ class UIManager:
         self.font = get_font(self.font_size)
         self.show_main_menu = True
         self.show_saves_menu = False
+        self.show_new_game_menu = False
+        self.selected_save = None #used to store what save we are using, used/changed when starting new game or loading game
+        #self.new_game_slot = None #used to pass whick save text file to write to when starting new game
         self.show_settings_popup = False
+        self.settings_pick = None
         self.main_menu_buttons = self.create_main_menu_buttons()  # Initialize with buttons
         self.save_button = SmallButton(self.WIDTH - int(self.WIDTH * 0.1), self.HEIGHT - int(self.HEIGHT * 0.1), "Save")
         self.sound_manager = SoundManager()
@@ -413,7 +417,7 @@ class UIManager:
                         self._button_clicked = True  # Lock the button to avoid multiple triggers
                         self.sound_manager.play_sound("menu-click")
                         if label == "Save Game":
-                            save(self)  # Handle the save game action
+                            save(self, self.selected_save)  # Handle the save game action
                         elif label == "Close Menu":
                             self.show_popup = False  # Close the pop-up when the button is clicked
                         elif label == "Toggle Sound":
@@ -542,8 +546,137 @@ class UIManager:
 
 
     # placeholder for rendering the save slots screen
-    def draw_save_slots(self):
-        pass
+    def draw_save_slots_popup(self, screen):
+        if self.show_saves_menu:
+            popup_width = int(self.WIDTH * 0.98)
+            popup_height = int(self.HEIGHT * 0.98)
+            popup_x = (self.WIDTH - popup_width) // 2
+            popup_y = (self.HEIGHT - popup_height) // 2  # Center the popup vertically
+            
+            # Draw the popup background
+            pygame.draw.rect(screen, GRAY, (popup_x, popup_y, popup_width, popup_height))
+
+            # Draw the title of the popup
+            title_font = get_font(int(popup_height * 0.1))
+            title_text = "Save Slots"
+            self.draw_text(title_text, title_font, BLACK, popup_x + popup_width // 2 - title_font.size(title_text)[0] // 2, popup_y + 10)
+
+            # Define the buttons and their labels
+            button_labels = ["Save 1", "Save 2", "Save 3", "Close"]
+            
+            # Set button properties
+            button_width = int(popup_width * 0.2)  # Adjust the button width based on the popup size
+            button_height = int(popup_height * 0.1)  # Set a reasonable button height
+
+            # Calculate the vertical position of the buttons (one row of buttons at the bottom)
+            button_y = popup_y + popup_height - button_height - 10
+            
+            # Space out the buttons horizontally based on the number of buttons
+            spacing = (popup_width - len(button_labels) * button_width) // (len(button_labels) + 1)  # Space between buttons
+
+            # Loop through the button labels and create the buttons
+            for index, label in enumerate(button_labels):
+                # Calculate the x-position of the current button
+                button_x = popup_x + (index + 1) * spacing + index * button_width
+                button = LargeButton(screen, button_x, button_y, label, button_width, button_height)
+                button.draw(screen)
+
+                # Handle the button click based on its label
+                mouse_pos = pygame.mouse.get_pos()
+                mouse_pressed = pygame.mouse.get_pressed()[0]  # Left mouse button pressed (0 = left, 1 = middle, 2 = right)
+
+                # Ensure the click is only handled once (we prevent double-clicking the button)
+                if button.is_clicked(mouse_pos) and mouse_pressed:
+                    print("Trying a button")
+                    if not hasattr(self, '_button_clicked') or not self._button_clicked:
+                        self._button_clicked = True  # Lock the button to avoid multiple triggers
+                        self.sound_manager.play_sound("menu-click")
+                        if label == "Save 1":
+                            self.selected_save = 'save1.txt'
+                        elif label == "Save 2":
+                            self.selected_save = 'save2.txt'
+                        elif label == "Save 3":
+                            self.selected_save = 'save3.txt'
+                        elif label == "Close":
+                            self.show_saves_menu = False  # Close the pop-up when the button is clicked
+                            
+                    else:
+                        # If the button was already clicked, do nothing (debounced)
+                        pass
+
+                # Reset the click lock when the mouse button is released
+                if not mouse_pressed:
+                    if hasattr(self, '_button_clicked') and self._button_clicked:
+                        self._button_clicked = False  # Unlock the button when the button is released
+
+    def draw_new_game_popup(self, screen):
+        if self.show_new_game_menu:
+            popup_width = int(self.WIDTH * 0.98)
+            popup_height = int(self.HEIGHT * 0.98)
+            popup_x = (self.WIDTH - popup_width) // 2
+            popup_y = (self.HEIGHT - popup_height) // 2  # Center the popup vertically
+            
+            # Draw the popup background
+            pygame.draw.rect(screen, GRAY, (popup_x, popup_y, popup_width, popup_height))
+
+            # Draw the title of the popup
+            title_font = get_font(int(popup_height * 0.1))
+            title_text = "New Game"
+            self.draw_text(title_text, title_font, BLACK, popup_x + popup_width // 2 - title_font.size(title_text)[0] // 2, popup_y + 10)
+
+            # Define the buttons and their labels
+            button_labels = ["Save 1", "Save 2", "Save 3", "Close"]
+            
+            # Set button properties
+            button_width = int(popup_width * 0.2)  # Adjust the button width based on the popup size
+            button_height = int(popup_height * 0.1)  # Set a reasonable button height
+
+            # Calculate the vertical position of the buttons (one row of buttons at the bottom)
+            button_y = popup_y + popup_height - button_height - 10
+            
+            # Space out the buttons horizontally based on the number of buttons
+            spacing = (popup_width - len(button_labels) * button_width) // (len(button_labels) + 1)  # Space between buttons
+
+            # Loop through the button labels and create the buttons
+            for index, label in enumerate(button_labels):
+                # Calculate the x-position of the current button
+                button_x = popup_x + (index + 1) * spacing + index * button_width
+                button = LargeButton(screen, button_x, button_y, label, button_width, button_height)
+                button.draw(screen)
+
+                # Handle the button click based on its label
+                mouse_pos = pygame.mouse.get_pos()
+                mouse_pressed = pygame.mouse.get_pressed()[0]  # Left mouse button pressed (0 = left, 1 = middle, 2 = right)
+
+                # Ensure the click is only handled once (we prevent double-clicking the button)
+                if button.is_clicked(mouse_pos) and mouse_pressed:
+                    print("Trying a button")
+                    if not hasattr(self, '_button_clicked') or not self._button_clicked:
+                        self._button_clicked = True  # Lock the button to avoid multiple triggers
+                        self.sound_manager.play_sound("menu-click")
+                        if label == "Save 1":
+                            self.selected_save = 'save1.txt'
+                        elif label == "Save 2":
+                            self.selected_save = 'save2.txt'
+                        elif label == "Save 3":
+                            self.selected_save = 'save3.txt'
+                        elif label == "Close":
+                            self.show_new_game_menu = False  # Close the pop-up when the button is clicked
+                    else:
+                        # If the button was already clicked, do nothing (debounced)
+                        pass
+
+                # Reset the click lock when the mouse button is released
+                if not mouse_pressed:
+                    if hasattr(self, '_button_clicked') and self._button_clicked:
+                        self._button_clicked = False  # Unlock the button when the button is released
+                        
+    def handle_new_game_click(self):
+        """Toggles the visibility of the save slots"""
+        self.show_new_game_menu = not self.show_new_game_menu
+    def handle_save_slot_click(self):
+        """Toggles the visibility of the save slots"""
+        self.show_saves_menu = not self.show_saves_menu #toggle saves menu pop-up
 
     def handle_popup_click(self):
         """Toggles the visibility of the pop-up menu."""
@@ -570,7 +703,7 @@ class UIManager:
             self.draw_text(title_text, title_font, BLACK, popup_x + popup_width // 2 - title_font.size(title_text)[0] // 2, popup_y + 10)
 
             # Define the buttons and their labels
-            button_labels = ["Save Game", "Close Menu", "Toggle Sound", "Quit"]
+            button_labels = ["Save Game", "Toggle Music", "Toggle Sound", "Close Menu"]
             
             # Set button properties
             button_width = int(popup_width * 0.2)  # Adjust the button width based on the popup size
@@ -600,15 +733,15 @@ class UIManager:
                         self._button_clicked = True  # Lock the button to avoid multiple triggers
                         self.sound_manager.play_sound("menu-click")
                         if label == "Save Game":
-                            save(self)  # Handle the save game action
-                        elif label == "Close Menu":
-                            self.show_settings_popup = False  # Close the pop-up when the button is clicked
+                            self.settings_pick = 1  # Handle the save game action
+                        elif label == "Toggle Music":
+                            self.settings_pick = 2  
                         elif label == "Toggle Sound":
-                            self.sound_manager.toggle_sound()  # Toggle sound on/off
+                            self.settings_pick = 3  
                             #self.sound_manager.play_music()
-                        elif label == "Quit":
-                            pygame.quit()  # Quit the game
-                            quit()  # Close the game completely
+                        elif label == "Close Menu":
+                            self.settings_pick = 4  # Quit the game
+                            #quit()  # Close the game completely
                     else:
                         # If the button was already clicked, do nothing (debounced)
                         pass
@@ -721,6 +854,8 @@ class UIManager:
             self.draw_main_menu()
         elif self.show_saves_menu:
             self.draw_save_slots()  
+        elif self.show_new_game_menu:
+            self.draw_new_game_popup()
         elif self.show_settings_popup:
             self.draw_settings_popup()
 
@@ -927,12 +1062,13 @@ class Game:
     def handle_events(self):
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_s:
-                    save(self.ui_manager)
-                elif event.key == pygame.K_l:
-                    load(self.ui_manager)
+                if event.key == pygame.K_s and self.ui_manager.selected_save != None:
+                    save(self.ui_manager, self.ui_manager.selected_save)
+                elif event.key == pygame.K_l and self.ui_manager.selected_save != None:
+                    load(self.ui_manager, self.ui_manager.selected_save)
                 elif event.key == pygame.K_ESCAPE:
                     self.ui_manager.show_main_menu = not self.ui_manager.show_main_menu
+                    self.ui_manager.show_saves_menu = False
             
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -941,26 +1077,69 @@ class Game:
             # Handle mouse clicks
             if event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_pos = pygame.mouse.get_pos()
-                if self.ui_manager.show_main_menu and not self.ui_manager.show_settings_popup:
+                if self.ui_manager.show_main_menu and not self.ui_manager.show_settings_popup and not self.ui_manager.show_saves_menu and not self.ui_manager.show_new_game_menu:
                     # Handle main menu button clicks
                     if self.ui_manager.button_clicked("Continue", mouse_pos):
-                        self.ui_manager = UIManager(self.achievement_manager) # recreates a new UIManager to populate with the save file's data
-                        # Load the game state when Continue is clicked
-                        if load(self.ui_manager) == None: # if a save file doesnt exist, create a new save
-                            self.ui_manager = UIManager(self.achievement_manager) # recreates a new UIManager with empty stats
-                            self.ui_manager.show_main_menu = False
-                        else: # else load the save file
-                            self.ui_manager.show_main_menu = False  # Hide the main menu after loading
+                        self.ui_manager.handle_save_slot_click()
                     elif self.ui_manager.button_clicked("New Game", mouse_pos):
-                        self.ui_manager.start_new_game()  # Start a new game with initial values
-                        self.ui_manager.show_main_menu = False
+                        self.ui_manager.handle_new_game_click()
                     elif self.ui_manager.button_clicked("Settings", mouse_pos):
                         self.ui_manager.handle_setting_popup_click()
                     elif self.ui_manager.button_clicked("Exit", mouse_pos):
                         pygame.quit()
                         sys.exit()
-                elif self.ui_manager.show_settings_popup:
-                    pass
+
+                elif self.ui_manager.show_saves_menu and self.ui_manager.show_main_menu:
+                    self.ui_manager.draw_save_slots_popup(self.ui_manager.screen)
+                    if self.ui_manager.selected_save == 'save1.txt':
+                        self.ui_manager = UIManager(self.achievement_manager) # recreates a new UIManager to populate with the save file's data
+                        self.ui_manager.selected_save = 'save1.txt'
+                        # Load the game state when Continue is clicked
+                        load(self.ui_manager, self.ui_manager.selected_save) # if == None: a save file doesnt exist, create a new save
+                        self.ui_manager.show_main_menu = False  # Hide the main menu after loading
+                    elif self.ui_manager.selected_save == 'save2.txt':
+                        self.ui_manager = UIManager(self.achievement_manager) # recreates a new UIManager to populate with the save file's data
+                        self.ui_manager.selected_save = 'save2.txt'
+                        # Load the game state when Continue is clicked
+                        load(self.ui_manager, self.ui_manager.selected_save) # if == None: a save file doesnt exist, create a new save
+                        self.ui_manager.show_main_menu = False  # Hide the main menu after loading
+                    elif self.ui_manager.selected_save == 'save3.txt':
+                        self.ui_manager = UIManager(self.achievement_manager) # recreates a new UIManager to populate with the save file's data
+                        self.ui_manager.selected_save = 'save3.txt'
+                        # Load the game state when Continue is clicked
+                        load(self.ui_manager, self.ui_manager.selected_save) # if == None: a save file doesnt exist, create a new save
+                        self.ui_manager.show_main_menu = False  # Hide the main menu after loading
+                               
+                elif self.ui_manager.show_new_game_menu and self.ui_manager.show_main_menu:
+                    self.ui_manager.draw_new_game_popup(self.ui_manager.screen)
+                    if self.ui_manager.selected_save == 'save1.txt':
+                        self.ui_manager.start_new_game()  # Start a new game with initial values
+                        self.ui_manager.show_main_menu = False
+                        self.ui_manager.handle_new_game_click()
+                    elif self.ui_manager.selected_save == 'save2.txt':
+                        self.ui_manager.start_new_game()  # Start a new game with initial values
+                        self.ui_manager.show_main_menu = False
+                        self.ui_manager.handle_new_game_click()
+                    elif self.ui_manager.selected_save == 'save3.txt':
+                        self.ui_manager.start_new_game()  # Start a new game with initial values
+                        self.ui_manager.show_main_menu = False
+                        self.ui_manager.handle_new_game_click()
+                
+                elif self.ui_manager.show_settings_popup and self.ui_manager.show_main_menu:
+                    self.ui_manager.draw_settings_popup(self.ui_manager.screen)
+                    if self.ui_manager.settings_pick == 1: # Handle the save game action
+                        try:
+                            save(self.ui_manager, self.ui_manager.selected_save)
+                        except:
+                            pass
+                    elif self.ui_manager.settings_pick == 2: # Toggle music on/off
+                        self.sound_manager.music_playing = not self.sound_manager.music_playing
+                        self.sound_manager.toggle_music = True
+                    elif self.ui_manager.settings_pick == 3: # Toggle sound on/off
+                        self.ui_manager.sound_manager.toggle_sound()
+                    elif self.ui_manager.settings_pick == 4: # Close the pop-up when the button is clicked
+                        self.ui_manager.show_settings_popup = False
+
                 else:
                     # Handle game-related clicks
                     if self.cookie.rect.collidepoint(mouse_pos):
@@ -981,7 +1160,8 @@ class Game:
                     if self.ui_manager.prestige_button.is_clicked(mouse_pos):
                         self.prestige.handle_prestige_click()
 
-                    if not self.ui_manager.draw_popup_menu and not self.prestige.draw_prestige_menu:
+                    #if not self.ui_manager.draw_popup_menu and not self.prestige.draw_prestige_menu:
+                    else:
                         self.ui_manager.handle_shop_click(mouse_pos)
                 self.cursor.animate()
 
@@ -1022,7 +1202,8 @@ class Game:
                 self.ui_manager.screen.blit(self.background_image, (0, 0))
                 self.ui_manager.run_main_menu()
                 self.ui_manager.draw_settings_popup(self.ui_manager.screen)
-                print(f"show_settings_popup: {self.ui_manager.show_settings_popup}")
+                self.ui_manager.draw_save_slots_popup(self.ui_manager.screen)
+                self.ui_manager.draw_new_game_popup(self.ui_manager.screen)
 
             else:
                 self.ui_manager.screen.blit(self.ig_background_image, (0, 0))
@@ -1059,3 +1240,6 @@ class Game:
             self.cursor.update_sprite()
             pygame.display.flip()
             self.clock.tick(30)  # Limit the game to 30 ticks per second
+            if self.sound_manager.toggle_music:
+                self.sound_manager.play_music()
+                self.sound_manager.toggle_music = False

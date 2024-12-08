@@ -12,9 +12,9 @@ Last Modified: 10/26/2024
 import time
 
 # function to load the user's save file (currently hardcoded to save.txt)
-def load(ui_manager):
+def load(ui_manager, save_name):
     try:
-        with open('save.txt', 'r') as file:
+        with open(save_name, 'r') as file:
             for number, line in enumerate(file):
                 if number == 0:
                     time_diff = time.time() - float(line.strip())

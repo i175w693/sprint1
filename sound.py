@@ -6,7 +6,7 @@ Output:
 Additional code sources: 
 Developers: Ian Wilson, Andrew Uriell, Peter Pham, Michael Oliver, Jack Youngquist
 Date: 11/3/2024
-Last Modified: 11/3/2024
+Last Modified: 11/8/2024
 '''
 import pygame
 
@@ -17,6 +17,8 @@ class SoundManager:
     def __init__(self, assets_path='./assets/sounds'):
         # Initialize the mixer module for handling sounds
         pygame.mixer.init()
+        self.toggle_music = False
+        self.music_playing = True
         self.sounds = {
             'click': pygame.mixer.Sound(f"{assets_path}/click.mp3"),
             'shop': pygame.mixer.Sound(f"{assets_path}/shop2.mp3"),
@@ -38,11 +40,10 @@ class SoundManager:
         global sound_enabled
         sound_enabled = not sound_enabled
         print("Sound Enabled:", sound_enabled)
-    
+       
     def play_music(self, assets_path='./assets/sounds'):
         """Plays the background music on loop if sound is enabled."""
-        global sound_enabled
-        if sound_enabled:
+        if self.music_playing:
             pygame.mixer.music.load(f"{assets_path}/smooth-coffee.mp3")
             pygame.mixer.music.play(loops=-1)  # Loop forever
             print("Background music started.")
