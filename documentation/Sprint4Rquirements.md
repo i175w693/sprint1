@@ -4,7 +4,7 @@
 
 - [X] Background Music
 - [X] Options Menu
-  - [ ] Tweak Options Menu to have toggle sound and toggle music
+  - [X] Tweak Options Menu to have toggle sound and toggle music
   - [ ] Add Basic explaination of controls 
 - [X] Prestige Mode
 - [ ] Prestige Upgrades
@@ -17,5 +17,6 @@
   - [ ] Event lock remains active after the gambling event
   - [X] Fix button overlap on popup menus
   - [X] Fix buying upgrades through popup menus
-- [ ] Save Slot Selection
+- [X] Save Slot Selection
+  - [ ] Fix issue where incorrect cookies are earned while away
 - [ ] Documentation

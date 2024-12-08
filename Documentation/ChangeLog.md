@@ -1,5 +1,15 @@
 # Change Log
 
+## December 8 (Sprint 4)
+
+### Added
+
+- Support for multiple save slots **(Jack)**
+
+### Modified
+
+- changed menu settings to toggle music and sfx independetly, got rid of Quit button **(Jack)**
+
 ## December 5 (Sprint 4)
 
 ### Added
