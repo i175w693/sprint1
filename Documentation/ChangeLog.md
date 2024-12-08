@@ -1,5 +1,18 @@
 # Change Log
 
+## December 8 (Sprint 4)
+
+### Added
+
+- Made it so all upgrade buttons dynamically show up according to their price **(Andrew)**
+- Fixed event lock for gambling event **(Andrew)**
+- Fixed display bug of upgrades prices **(Andrew)**
+- Support for multiple save slots **(Jack)**
+
+### Modified
+
+- changed menu settings to toggle music and sfx independetly, got rid of Quit button **(Jack)**
+
 ## December 5 (Sprint 4)
 
 ### Added
