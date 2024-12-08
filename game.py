@@ -128,17 +128,20 @@ class UIManager:
         self.max_scroll_offset = max(0, total_height - int(self.HEIGHT * 0.8))  # Calculate max scroll offset
 
         for idx, (k, v) in enumerate(all_shop_items.items()):
-            # Check affordability for upgrades only
-            if isinstance(v, ShopUpgrade) and self.cookie_count < v.cost:
-                continue  # Skip if the upgrade cannot be afforded
+            # Check affordability before adding the button
+            current_price = int(v.base_cost * (1.15 ** v.purchased_count))  # Calculate the price
+            if self.cookie_count < current_price:  # Skip if player cannot afford
+                continue
 
             button_width = int(self.WIDTH * 0.15)
             button_y = int(self.HEIGHT * 0.15) + idx * (button_height + button_margin) - self.max_scroll_offset
-            button = LargeButton(self.screen, 
-                                self.WIDTH - int(self.WIDTH * 0.25), 
-                                button_y, 
-                                v.name, button_width, button_height,
-                                v.image)
+            button = LargeButton(
+                self.screen, 
+                self.WIDTH - int(self.WIDTH * 0.25), 
+                button_y, 
+                v.name, button_width, button_height,
+                v.image
+            )
             buttons.append((button, v))
         return buttons
 
@@ -212,7 +215,8 @@ class UIManager:
                     self.sound_manager.play_sound("shop")
 
                     # Refresh the buttons after purchase to show/hide based on affordability
-                    self.buttons = self.create_buttons()
+                    button.text = f"{self.simplify_number(current_price)} cookies"
+                    self.buttons = self.create_buttons()  # Ensure dynamic update of button prices
 
 
     # returns the amount of cookies the user should be earning per second based on the purchased items
@@ -983,9 +987,6 @@ class RandomEventManager:
             self.show_gambling_popup = True  # Show gambling popup
 
 
-
-
-
     def is_event_active(self, event):
         """Check if a specific event is active."""
         return event in self.active_events and time.time() < self.active_events[event]
@@ -1008,11 +1009,15 @@ class RandomEventManager:
             if not self.is_event_active(event):
                 self.clear_event(event, ui_manager)
 
+        # Reset the event lock after clearing all expired events
+        if not self.active_events:  # No active events remain
+            self.event_lock = False
+
     def resolve_gambling_event(self, ui_manager, risk):
         if risk:
             if random.random() <= 0.80:  # 80% chance to double cookies
                 ui_manager.cookie_count *= 5
-                print("Lucky! Your cookies Quintupled!")
+                print("Lucky! Your cookies quintupled!")
             else:
                 ui_manager.cookie_count = 0
                 print("Unlucky! You lost your cookies!")
@@ -1022,8 +1027,8 @@ class RandomEventManager:
         # Close the popup
         self.show_gambling_popup = False
 
-
-
+        # Reset the event lock
+        self.event_lock = False
 
 class CookieAnalytics:
     def __init__(self):

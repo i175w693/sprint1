@@ -19,7 +19,8 @@
 
 ### Andrew Uriell
 
-
+- 1 (12/8)
+- 1 (12/7)
 
 ### Michael Oliver
  - .5 (12/2)

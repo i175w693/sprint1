@@ -11,10 +11,10 @@
   - [ ] Upgrade 1
   - [ ] Upgrade 2
   - [ ] Upgrade 3
-- [ ] Bug Fixes / Testing
+- [X] Bug Fixes / Testing
   - [X] Fix Achievement 'Locked' Indicator in settings
-  - [ ] Fix display bug of upgrade prices
-  - [ ] Event lock remains active after the gambling event
+  - [X] Fix display bug of upgrade prices
+  - [X] Event lock remains active after the gambling event
   - [X] Fix button overlap on popup menus
   - [X] Fix buying upgrades through popup menus
 - [X] Save Slot Selection

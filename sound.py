@@ -36,9 +36,18 @@ class SoundManager:
             print(f"Sound '{sound_name}' not found in sounds dictionary.")
     
     def toggle_sound(self):
-        """Toggles the global sound state on/off."""
+        """Toggles the global sound state and manages background music playback."""
         global sound_enabled
-        sound_enabled = not sound_enabled
+        sound_enabled = not sound_enabled  # Toggle sound state
+
+        if sound_enabled:
+            # Resume background music if enabled
+            if not pygame.mixer.music.get_busy():  # Check if music is already playing
+                self.play_music()
+        else:
+            # Stop background music if disabled
+            pygame.mixer.music.stop()
+
         print("Sound Enabled:", sound_enabled)
        
     def play_music(self, assets_path='./assets/sounds'):
